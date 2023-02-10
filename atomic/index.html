@@ -1,0 +1,269 @@
+<!DOCTYPE html><html class="theme-next pisces use-motion" lang="zh-Hans,en,default"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><meta name="theme-color" content="#222"><script src="/lib/pace/pace.min.js?v=1.0.2"></script><link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"><link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css"><link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css"><link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4"><link rel="icon" type="image/png" sizes="32x32" href="/images/logo.png?v=5.1.4"><link rel="icon" type="image/png" sizes="16x16" href="/images/logo.png?v=5.1.4"><link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222"><meta name="keywords" content="atomic,原子,多核,锁,MESI,缓存一致性,内存屏障,"><link rel="alternate" href="/atom.xml" title=">_" type="application/atom+xml"><meta name="description" content="引言：编程中，经常遇到并发处理的时候，一般我们采用多线程，对于一些涉及多线程处理内存空间，一般我们会采用加锁，让每次只能有一个线程进行操作；当然还有采用原子操作的方式。主要目的就是保证我们多个线程对同一块内存的操作是串行的，不会因为并发操作把内存写的不符合预期。那么，这种原子操作具体是怎么实现的呢？一段代码先看一段代码1234567891011121314151617181920212223#in"><meta property="og:type" content="article"><meta property="og:title" content="浅谈原子操作的实现原理"><meta property="og:url" content="https://www.codeloverme.cn/atomic/index.html"><meta property="og:site_name" content="&gt;_"><meta property="og:description" content="引言：编程中，经常遇到并发处理的时候，一般我们采用多线程，对于一些涉及多线程处理内存空间，一般我们会采用加锁，让每次只能有一个线程进行操作；当然还有采用原子操作的方式。主要目的就是保证我们多个线程对同一块内存的操作是串行的，不会因为并发操作把内存写的不符合预期。那么，这种原子操作具体是怎么实现的呢？一段代码先看一段代码1234567891011121314151617181920212223#in"><meta property="article:published_time" content="2022-01-18T17:18:32.000Z"><meta property="article:modified_time" content="2023-02-10T04:55:48.159Z"><meta property="article:author" content="codelover"><meta property="article:tag" content="atomic"><meta property="article:tag" content="原子"><meta property="article:tag" content="多核"><meta property="article:tag" content="锁"><meta property="article:tag" content="MESI"><meta property="article:tag" content="缓存一致性"><meta property="article:tag" content="内存屏障"><meta name="twitter:card" content="summary"><script type="text/javascript" id="hexo.configurations">var NexT=window.NexT||{},CONFIG={root:"/",scheme:"Pisces",version:"5.1.4",sidebar:{position:"left",display:"post",offset:12,b2t:!0,scrollpercent:!0,onmobile:!1},fancybox:!0,tabs:!0,motion:{enable:!0,async:!1,transition:{post_block:"fadeIn",post_header:"slideDownIn",post_body:"slideDownIn",coll_header:"slideLeftIn",sidebar:"slideUpIn"}},duoshuo:{userId:"0",author:"博主"},algolia:{applicationID:"",apiKey:"",indexName:"",hits:{per_page:10},labels:{input_placeholder:"Search for Posts",hits_empty:"We didn't find any results for the search: ${query}",hits_stats:"${hits} results found in ${time} ms"}}}</script><link rel="canonical" href="https://www.codeloverme.cn/atomic/"><title>浅谈原子操作的实现原理 | >_</title><script>!function(e,a,t,n,g,c){e.GoogleAnalyticsObject=n,e.ga=e.ga||function(){(e.ga.q=e.ga.q||[]).push(arguments)},e.ga.l=+new Date,g=a.createElement(t),c=a.getElementsByTagName(t)[0],g.async=1,g.src="https://www.google-analytics.com/analytics.js",c.parentNode.insertBefore(g,c)}(window,document,"script","ga"),ga("create","UA-161863329-1","auto"),ga("send","pageview")</script><meta name="generator" content="Hexo 4.2.1"><link rel="stylesheet" href="/assets/css/APlayer.min.css" class="aplayer-style-marker">
+<script src="/assets/js/APlayer.min.js" class="aplayer-script-marker"></script>
+<script src="/assets/js/Meting.min.js" class="meting-script-marker"></script>
+</head><body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans"><div class="container sidebar-position-left page-post-detail"><div class="headband"></div><header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="header-inner"><div class="site-brand-wrapper"><div class="site-meta"><div class="custom-logo-site-title"><a href="/" class="brand" rel="start"><span class="logo-line-before"><i></i></span> <span class="site-title">>_</span> <span class="logo-line-after"><i></i></span></a></div><h1 class="site-subtitle" itemprop="description">一行代码</h1></div><div class="site-nav-toggle"><button><span class="btn-bar"></span> <span class="btn-bar"></span> <span class="btn-bar"></span></button></div></div><nav class="site-nav"><ul id="menu" class="menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i><br>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i><br>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i><br>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i><br>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i><br>归档</a></li><li class="menu-item menu-item-search"><a href="javascript:;" class="popup-trigger"><i class="menu-item-icon fa fa-search fa-fw"></i><br>搜索</a></li></ul><div class="site-search"><div class="popup search-popup local-search-popup"><div class="local-search-header clearfix"><span class="search-icon"><i class="fa fa-search"></i> </span><span class="popup-btn-close"><i class="fa fa-times-circle"></i></span><div class="local-search-input-wrapper"><input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input"></div></div><div id="local-search-result"></div></div></div></nav></div></header><main id="main" class="main"><div class="main-inner"><div class="content-wrap"><div id="content" class="content"><div id="posts" class="posts-expand"><article class="post post-type-normal" itemscope itemtype="http://schema.org/Article"><div class="post-block"><link itemprop="mainEntityOfPage" href="https://www.codeloverme.cn/atomic/"><span hidden itemprop="author" itemscope itemtype="http://schema.org/Person"><meta itemprop="name" content="codelover"><meta itemprop="description" content=""><meta itemprop="image" content="/images/logo.png"></span><span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization"><meta itemprop="name" content=">_"></span><header class="post-header"><h2 class="post-title" itemprop="name headline">浅谈原子操作的实现原理</h2><div class="post-meta"><span class="post-time"><span class="post-meta-item-icon"><i class="fa fa-calendar-o"></i> </span><span class="post-meta-item-text">发表于</span> <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-01-19T01:18:32+08:00">2022-01-19 </time></span><span class="post-category"><span class="post-meta-divider">|</span> <span class="post-meta-item-icon"><i class="fa fa-folder-o"></i> </span><span class="post-meta-item-text">分类于</span> <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span> </a></span></span><span class="post-meta-divider">|</span> <span class="page-pv"><i class="fa fa-eye"></i> <span class="busuanzi-value" id="busuanzi_value_page_pv"></span></span><div class="post-wordcount"><span class="post-meta-item-icon"><i class="fa fa-file-word-o"></i> </span><span class="post-meta-item-text">字数统计&#58;</span> <span title="字数统计">3.1k </span><span class="post-meta-divider">|</span> <span class="post-meta-item-icon"><i class="fa fa-clock-o"></i> </span><span class="post-meta-item-text">阅读时长 &asymp;</span> <span title="阅读时长">13</span></div></div></header><div class="post-body" itemprop="articleBody"><blockquote><p>引言：编程中，经常遇到并发处理的时候，一般我们采用多线程，对于一些涉及多线程处理内存空间，一般我们会采用加锁，让每次只能有一个线程进行操作；当然还有采用原子操作的方式。主要目的就是保证我们多个线程对同一块内存的操作是串行的，不会因为并发操作把内存写的不符合预期。那么，这种原子操作具体是怎么实现的呢？</p></blockquote><h4 id="一段代码"><a href="#一段代码" class="headerlink" title="一段代码"></a>一段代码</h4><ul><li>先看一段代码</li></ul><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> NUM_THREADS 4</span></span><br><span class="line"><span class="keyword">int</span> global_num;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">void</span>* <span class="title">run</span><span class="params">(<span class="keyword">void</span>* args)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;<span class="number">100000000</span>; i++)&#123;</span><br><span class="line">        global_num++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">pthread_t</span> tids[NUM_THREADS];</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; NUM_THREADS; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        pthread_create(&amp;tids[i], <span class="literal">NULL</span>, run, <span class="literal">NULL</span>);</span><br><span class="line">        pthread_join (tids[i], <span class="literal">NULL</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><ul><li>多线程下，<code>global_num</code>的值是无法预期的</li></ul><h4 id="如何保证原子性？"><a href="#如何保证原子性？" class="headerlink" title="如何保证原子性？"></a>如何保证原子性？</h4><ul><li>加锁</li><li>原子操作</li></ul><h5 id="加锁"><a href="#加锁" class="headerlink" title="加锁"></a>加锁</h5><ul><li>上面的代码，我们采用加锁的方式的话，一般会这样操作。<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::mutex g_mutex;</span><br><span class="line"><span class="function"><span class="keyword">void</span>* <span class="title">run</span><span class="params">(<span class="keyword">void</span>* args)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;<span class="number">100000000</span>; i++)&#123;</span><br><span class="line">        g_mutex.lock();</span><br><span class="line">        global_num++;</span><br><span class="line">        g_mutex.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li><li>这样便保证了每一个线程在操作变量的时候都是独占的，线程间不会相互影响。</li></ul><h5 id="原子操作"><a href="#原子操作" class="headerlink" title="原子操作"></a>原子操作</h5><ul><li>当然还有一种更高效的方式，是使用原子操作<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">void</span>* run(<span class="built_in">void</span>* args)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="built_in">int</span> i=<span class="number">0</span>; i&lt;<span class="number">100000000</span>; i++)&#123;</span><br><span class="line">        __sync_fetch_and_add(&amp;global_num,<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li></ul><h4 id="性能有多少区别？"><a href="#性能有多少区别？" class="headerlink" title="性能有多少区别？"></a>性能有多少区别？</h4><ul><li><p>通过<code>4</code>个线程执行<code>1亿</code>次纯<code>i++</code>运算，通过时间来看性能差别</p></li><li><p>加锁</p><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">400000000(运算结果)</span><br><span class="line"></span><br><span class="line">real    0m10.035s</span><br><span class="line">user    0m10.030s</span><br><span class="line">sys     0m0.004s</span><br></pre></td></tr></table></figure></li><li><p>原子操作</p><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">400000000</span><br><span class="line"></span><br><span class="line">real    0m2.427s</span><br><span class="line">user    0m2.420s</span><br><span class="line">sys     0m0.004s</span><br></pre></td></tr></table></figure></li><li><p>我的机器是i5 4核，目前跑出来加锁耗时10s，原子操作耗时2s，相差在5倍左右</p></li></ul><h4 id="原子操作到底变成了什么？"><a href="#原子操作到底变成了什么？" class="headerlink" title="原子操作到底变成了什么？"></a>原子操作到底变成了什么？</h4><ul><li>通过<code>g++ -S -o atomic.s thread_with_atomic.cpp -lpthread</code>编译成汇编代码，得到了下面对<code>run</code>函数的实现<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">_Z3runPv</span>:</span><br><span class="line">    <span class="keyword">pushq	</span>%rbp</span><br><span class="line">    <span class="keyword">movq	</span>%rsp, %rbp</span><br><span class="line">    <span class="keyword">movq	</span>%rdi, -<span class="number">24</span>(%rbp)</span><br><span class="line">    <span class="keyword">movl	</span><span class="number">$0</span>, -<span class="number">4</span>(%rbp)</span><br><span class="line"><span class="symbol">.L3</span>:</span><br><span class="line">    <span class="keyword">cmpl	</span><span class="number">$99999999</span>, -<span class="number">4</span>(%rbp)</span><br><span class="line">    jg	.L2</span><br><span class="line">    lock <span class="keyword">addl	</span><span class="number">$1</span>, global_num(%rip)</span><br><span class="line">    <span class="keyword">addl	</span><span class="number">$1</span>, -<span class="number">4</span>(%rbp)</span><br><span class="line">    jmp	.L3</span><br><span class="line"><span class="symbol">.L2</span>:</span><br><span class="line">    <span class="keyword">movl	</span><span class="number">$0</span>, %eax</span><br><span class="line">    <span class="keyword">popq	</span>%rbp</span><br><span class="line">    ret</span><br></pre></td></tr></table></figure></li><li>核心的一句是<code>lock addl $1, global_num(%rip)</code></li></ul><h4 id="lock发生了什么？"><a href="#lock发生了什么？" class="headerlink" title="lock发生了什么？"></a><code>lock</code>发生了什么？</h4><h5 id="总线锁"><a href="#总线锁" class="headerlink" title="总线锁"></a>总线锁</h5><p>早期的时候，当cpu执行lock指令的时候，会直接进行总线锁，就是把总线锁住，这样cpu和内存之间就不能进行通信，如果多核cpu，就出现了一核工作，多核围观的尴尬局面，此时就会出现严重的资源浪费问题，开销比较大。</p><h5 id="缓存锁"><a href="#缓存锁" class="headerlink" title="缓存锁"></a>缓存锁</h5><p>后面有了缓存锁，缓存锁不再锁总线，而是在写回内存时，通过一致性机制来保证一个时刻只有一个核心能修改指定的内存区域。</p><h5 id="何时使用"><a href="#何时使用" class="headerlink" title="何时使用"></a>何时使用</h5><p>有些场景是不能使用的缓存锁的，只能进行总线锁</p><ul><li>当操作的数据不能被缓存在处理器内部</li><li>跨多个缓存行操作</li><li>处理器不支持</li></ul><h4 id="缓存锁是什么原理？"><a href="#缓存锁是什么原理？" class="headerlink" title="缓存锁是什么原理？"></a>缓存锁是什么原理？</h4><p>总线锁很好理解，通过锁住cpu和内存通信，并阻塞cpu执行指令完成。但是缓存锁呢？这就需要了解一下<strong>缓存一致性</strong>了。</p><h5 id="cpu和缓存的关系"><a href="#cpu和缓存的关系" class="headerlink" title="cpu和缓存的关系"></a>cpu和缓存的关系</h5><pre class="mermaid">graph TD
+subgraph Cpu
+    subgraph Cpu1
+        cpu1(cpu1) --> cache1(L1)
+        cache1 --> cache12(L2)
+    end
+        cache12 --> cacheShare(L3)
+    subgraph Cpu2    
+        cpu2(cpu2) --> cache2(L1)
+        cache2 --> cache22(L2)    
+    end
+        cache22 --> cacheShare(L3)
+    subgraph Cpu3
+        cpu3(cpu3) --> cache3(L1)
+        cache3 --> cache32(L2)
+    end
+        cache32 --> cacheShare(L3)
+    subgraph Cpu4
+        cpu4(cpu4) --> cache4(L1)
+        cache4 --> cache42(L2)
+    end
+        cache42 --> cacheShare(L3)
+end
+    cacheShare(L3) --总线--> mem(内存)</pre><p>首先了解下cpu，缓存，内存之间的关系，大致是这样的，1,2级缓存cpu独享，3级缓存共享，共享物理内存。<br>每个核心都有自己的cache，那么如何保证cpu之间的数据一致呢?</p><h5 id="cache写"><a href="#cache写" class="headerlink" title="cache写"></a>cache写</h5><h5 id="写通"><a href="#写通" class="headerlink" title="写通"></a>写通</h5><ul><li>每次cpu修改了cache中的内容，都会立即写入内存，高一致性，但是效率不高。</li></ul><h5 id="写回"><a href="#写回" class="headerlink" title="写回"></a>写回</h5><ul><li>每次cpu修改了cache中的内容，不会立即写入内存。</li></ul><h5 id="写失效（MESI）"><a href="#写失效（MESI）" class="headerlink" title="写失效（MESI）"></a>写失效（MESI）</h5><ul><li>当一个cpu已经修改了数据，如果其他cpu有数据，则通知其修改。</li></ul><h5 id="写更新"><a href="#写更新" class="headerlink" title="写更新"></a>写更新</h5><ul><li>当一个cpu已经修改了数据，如果其他CPU有该数据，则通知其跟新数据。</li></ul><h4 id="MESI-–-维基百科"><a href="#MESI-–-维基百科" class="headerlink" title="MESI – 维基百科"></a>MESI <em><a href="https://zh.wikipedia.org/wiki/MESI%E5%8D%8F%E8%AE%AE" target="_blank" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">– 维基百科</a></em></h4><ul><li><strong>已修改Modified (M)</strong><br>缓存行是脏的（dirty），与主存的值不同。如果别的CPU内核要读主存这块数据，该缓存行必须回写到主存，状态变为共享(S).</li><li><strong>独占Exclusive (E)</strong><br>缓存行只在当前缓存中，但是干净的（clean）–缓存数据同于主存数据。当别的缓存读取它时，状态变为共享；当前写数据时，变为已修改状态。</li><li><strong>共享Shared (S)</strong><br>缓存行也存在于其它缓存中且是干净的。缓存行可以在任意时刻抛弃。</li><li><strong>无效Invalid (I)</strong><br>缓存行是无效的</li></ul><ul><li><strong>任意一对缓存，对应缓存行的相容关系:</strong> <em><a href="https://zh.wikipedia.org/wiki/MESI%E5%8D%8F%E8%AE%AE" target="_blank" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">– 维基百科</a></em></li></ul><table><thead><tr><th></th><th>已修改M</th><th>独占E</th><th>共享S</th><th>无效I</th></tr></thead><tbody><tr><td>已修改M</td><td>x</td><td>x</td><td>x</td><td>o</td></tr><tr><td>独占E</td><td>x</td><td>x</td><td>x</td><td>o</td></tr><tr><td>共享S</td><td>x</td><td>x</td><td>o</td><td>o</td></tr><tr><td>无效I</td><td>o</td><td>o</td><td>o</td><td>o</td></tr></tbody></table><blockquote><p>当块标记为 M (已修改), 在其他缓存中的数据副本被标记为I(无效)</p></blockquote><h5 id="状态图"><a href="#状态图" class="headerlink" title="状态图"></a>状态图</h5><p>上面的表可以用状态图来表示，如下</p><ul><li>M:修改</li><li>S:共享</li><li>E:独享</li><li>I:无效</li><li>LR:Local Read 本地cache读取本地cache</li><li>LW:Local Write 本地cache写入本地cache</li><li>RR:Remote Read 其他cache读取本地cache</li><li>RW:Remote Write 其他cache写入本地cache</li></ul><pre class="mermaid">graph LR
+
+subgraph Modified
+M((M,修改))
+end
+subgraph Shared
+S((S,共享))
+end
+subgraph Exclusive
+E((E,独享))
+end
+subgraph Invalid
+I((I,无效))
+end
+
+
+
+M --LR本地读--> M
+M --RR其他读--> M
+M --RW其他写--> I
+M --RR其他读--> S
+
+I --LW本地写--> M
+I --LR本地读--> E
+
+E --RW其他写--> I
+E --LR本地读--> E
+E --RR其他读--> S
+E --LW本地写--> M
+
+S --LR本地读--> S
+S --RR其他读--> S
+S --LW本地写--> M
+S --RW其他写--> I</pre><h5 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h5><ul><li>初始化</li></ul><pre class="mermaid">graph TD
+subgraph Cpu
+    subgraph Cpu1
+       cacheLine(cacheLine)
+    end
+    subgraph Cpu2
+       cacheLine1(cacheLine)
+    end
+    subgraph Cpu3
+       cacheLine2(cacheLine)
+    end
+end
+cacheLine --- bus(总线)
+cacheLine1 --- bus(总线)
+cacheLine2 --- bus(总线)
+bus --- mem(内存<br>x=0)
+style mem fill:red</pre><ul><li>cpu1读取</li></ul><pre class="mermaid">graph TD
+subgraph Cpu
+    subgraph Cpu1
+       cacheLine(cacheLine<br>x=0<br>E,独占)
+       style cacheLine fill:red
+    end
+    subgraph Cpu2
+       cacheLine1(cacheLine)
+    end
+    subgraph Cpu3
+       cacheLine2(cacheLine)
+    end
+end
+cacheLine --- bus(总线)
+cacheLine1 --- bus(总线)
+cacheLine2 --- bus(总线)
+bus --- 内存(内存<br>x=0)</pre><ul><li>cpu2读取</li></ul><p>cpu2读取，此时cpu1处于监听中，当他发现cpu2要读的地址是自己的cacheline中的，所以cpu1做出响应，把数据给cpu2<br>cpu1在E收到RR，E–&gt;S</p><pre class="mermaid">graph TD
+subgraph Cpu
+    subgraph Cpu1
+       cacheLine(cacheLine<br>x=0<br>S,共享)
+       style cacheLine fill:red
+    end
+    subgraph Cpu2
+       cacheLine1(cacheLine<br>x=0<br>S,共享)
+       style cacheLine1 fill:red
+    end
+    subgraph Cpu3
+       cacheLine2(cacheLine)
+    end
+end
+cacheLine --- bus(总线)
+cacheLine1 --- bus(总线)
+cacheLine2 --- bus(总线)
+bus --- 内存(内存<br>x=0)</pre><ul><li>cpu1修改</li></ul><p>cpu1在S收到LW，S–&gt;M<br>cpu2在S收到RW，S–&gt;I</p><pre class="mermaid">graph TD
+subgraph Cpu
+    subgraph Cpu1
+       cacheLine(cacheLine<br>x=1<br>M,修改)
+       style cacheLine fill:red
+    end
+    subgraph Cpu2
+       cacheLine1(cacheLine<br>x=0<br>I,无效)
+       style cacheLine1 fill:red
+    end
+    subgraph Cpu3
+       cacheLine2(cacheLine)
+    end
+end
+cacheLine --- bus(总线)
+cacheLine1 --- bus(总线)
+cacheLine2 --- bus(总线)
+bus --- 内存(内存<br>x=0)</pre><ul><li>cpu2读取</li></ul><p>cpu2读取的时候<br>cpu1在M收到远程读，此时会把cache的值写入内存，从M–&gt;S<br>cpu2在I收到LR，从I–&gt;S</p><pre class="mermaid">graph TD
+subgraph Cpu
+    subgraph Cpu1
+       cacheLine(cacheLine<br>x=1<br>S,共享)
+       style cacheLine fill:red
+    end
+    subgraph Cpu2
+       cacheLine1(cacheLine<br>x=1<br>S,共享)
+       style cacheLine1 fill:red
+    end
+    subgraph Cpu3
+       cacheLine2(cacheLine)
+    end
+end
+cacheLine --- bus(总线)
+cacheLine1 --- bus(总线)
+cacheLine2 --- bus(总线)
+bus --- mem(内存<br>x=1)
+style mem fill:red</pre><h5 id="似乎完美了？"><a href="#似乎完美了？" class="headerlink" title="似乎完美了？"></a>似乎完美了？</h5><p>这样是不是就完美了？其实不是的，当cpu1切换状态的时候，此时，cpu1需要通知其他所有cpu，让其他cpu进行确认，并且在发出消息，接收所有cpu回应这一段时间，cpu1可能出现阻塞的情况，导致性能不佳，这样的情况又要怎么处理？</p><pre class="mermaid">sequenceDiagram
+participant cpu1
+participant cpu2
+participant cpu3
+participant cpu4
+
+cpu1->> + cpu2:invalidate
+cpu1->>  cpu3:invalidate
+cpu1->>  cpu4:invalidate
+
+cpu2->>  cpu1:ack
+cpu3->>  cpu1:ack
+cpu4->> - cpu1:ack
+Note over cpu1,cpu4 : 阻塞至其他cpu全部确认
+cpu1->>cpu1:执行其他指令</pre><h5 id="Store-Bufferes"><a href="#Store-Bufferes" class="headerlink" title="Store Bufferes"></a>Store Bufferes</h5><p>为了避免上述的情况导致cpu1阻塞，cpu引入的Store Bufferes，原理就是当cpu要等待其他cpu的确认的时候，先把修改后的值写入Store Bufferes，等待其他所有cpu的响应，此时可以去处理其他事，当所有确认都收到，再把数据提交。</p><pre class="mermaid">graph TD
+subgraph Cpu
+    cpu0
+    buff(Store Bufferes)
+    cache
+
+    cpu0 --> buff
+    buff --> cache
+    cache --> cpu0
+end</pre><h5 id="新的问题"><a href="#新的问题" class="headerlink" title="新的问题"></a>新的问题</h5><figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">a=1;</span></span><br><span class="line"><span class="attr">b=a+1；</span></span><br><span class="line"><span class="keyword">assert</span>(<span class="attr">b</span> == <span class="number">2</span>)</span><br></pre></td></tr></table></figure><pre class="mermaid">sequenceDiagram
+participant cpu0
+participant cpu0SB
+Note over cpu0SB:  cpu0的Store Bufferes
+participant cpu0CL
+Note over cpu0CL: cpu0的cacheLine b=0
+participant cpu1
+Note over cpu1 : cpu1中cacheline a=0
+
+
+
+Note over cpu0 : cpu0执行a=1
+
+cpu0->>cpu1: cpu0 缓存没命中a,发送 read invalidate 到cpu1，读取a的值
+cpu0->>cpu0SB: 写入a=1到Store Bufferes
+
+cpu1->>cpu0CL: 发送a=0到cpu0
+cpu0CL->>cpu0: cpu0从cacheLine读取a=0到寄存器
+cpu0SB->>cpu0CL: 写入存在Store Bufferes的a=1
+cpu0->>cpu0: 执行b=a+1</pre><p>最后<code>b=1</code>不符合期望</p><h5 id="store-forwarding"><a href="#store-forwarding" class="headerlink" title="store forwarding"></a>store forwarding</h5><p>为了解决上面的问题，硬件工程师修改了cpu的设计<br>当CPU执行load操作的时候，不但要看cache，还有看store buffer是否有内容，如果store buffer有该数据，那么就采用store buffer中的值。因此，即便是store操作还没有写入cacheline，store forwarding的效果看起来就好象cpu的store操作被向前传递了一样（后面的load的指令可以感知到这个store操作）</p><pre class="mermaid">graph TD
+subgraph Cpu
+    cpu0
+    buff(Store Bufferes)
+    cache
+
+    cpu0 --> buff
+    buff --> cache
+    cache --还要根据Store Bufferes是否有这个值进行返回--> cpu0
+end</pre><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">void foo()&#123;</span><br><span class="line">    <span class="attribute">a</span>=1;</span><br><span class="line">    <span class="attribute">b</span>=1;</span><br><span class="line">&#125;</span><br><span class="line">void bar()&#123;</span><br><span class="line">    <span class="keyword">while</span>(<span class="attribute">b</span>==0) continue;</span><br><span class="line">    assert(<span class="attribute">a</span>==1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><pre class="mermaid">sequenceDiagram
+participant cpu0
+Note over cpu0: cpu0执行foo函数
+
+participant cpu0SB
+Note over cpu0SB:  cpu0的Store Bufferes
+participant cpu0CL
+Note over cpu0CL: cpu0的cacheLine b=0
+participant cpu1
+Note over cpu1 : cpu1中cacheline a=0
+Note over cpu1 : cpu1执行bar函数
+
+Note over cpu0 : cpu0执行a=1
+
+cpu0->>cpu1: cpu0 缓存没命中a,发送 read invalidate 到cpu1，读取a的值
+cpu0->>cpu0SB: 写入a=1到Store Bufferes
+
+Note over cpu1 : cpu1执行while(b==0)
+cpu1->>cpu0: cpu1 cache中没有b的值,发送 read invalidate 到cpu0，试图读取b的值
+
+Note over cpu0 : cpu0继续执行b=1
+
+cpu0->>cpu0CL: 由于cacheline中有b的值，处于E或者M状态，所以直接更新b=1到cacheline
+
+Note over cpu0 : cpu0收到cpu1要读取b的值
+cpu0CL->>cpu1: cpu0把最新的b=1给cpu1，同时修改自己的状态为S
+
+Note over cpu1 : cpu1判断b为1，跳出循环
+Note over cpu1 : cpu1执行assert(a==1),此时cpu1中a还等于0，失败
+
+Note over cpu1 : cpu1收到cpu0的read invalidate
+Note over cpu1 : 返回a的值，并且清空自己的cache，但是此时已经晚了
+
+
+cpu0SB->>cpu0CL: cpu0收到ack，把a=1写入cache，但是此时cpu1已经assert fail了</pre><figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">void</span> foo(<span class="built_in">void</span>)</span><br><span class="line">&#123;</span><br><span class="line">    a = <span class="number">1</span>;</span><br><span class="line">    smp_mb();</span><br><span class="line">    b = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">void</span> bar(<span class="built_in">void</span>)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">while</span> (b == <span class="number">0</span>) <span class="keyword">continue</span>;</span><br><span class="line">    smp_mb();</span><br><span class="line">    assert(a == <span class="number">1</span>);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure><pre class="mermaid">sequenceDiagram
+participant cpu0
+Note over cpu0: cpu0执行foo函数
+
+participant cpu0SB
+Note over cpu0SB:  cpu0的Store Bufferes
+participant cpu0CL
+Note over cpu0CL: cpu0的cacheLine b=0
+participant cpu1
+Note over cpu1 : cpu1中cacheline a=0
+Note over cpu1 : cpu1执行bar函数
+
+Note over cpu0 : cpu0执行a=1
+
+cpu0->>cpu1: cpu0 缓存没命中a,发送 read invalidate 到cpu1，读取a的值
+cpu0->>cpu0SB: 写入a=1到Store Bufferes
+
+Note over cpu1 : cpu1执行while(b==0)
+cpu1->>cpu0: cpu1 cache中没有b的值,发送 read invalidate 到cpu0，试图读取b的值
+
+Note over cpu0 : cpu0遇到smp_mb(),标记Store Bufferes中的a=1
+
+
+Note over cpu1 : cpu1收到cpu0的 <br> invalidate 消息，放入Invalidate Queue，<br>并立刻回送Ack。
+cpu1->>cpu0: cpu1返回Invalidate ack
+cpu0SB->>cpu0CL: cpu0收到ack，把a=1写入cacheline
+Note over cpu0 : cpu0越过内存屏障，继续执行b=1
+
+cpu0->>cpu0CL: 由于cacheline中有b的值，处于E或者M状态，所以直接更新b=1到cacheline
+
+Note over cpu0 : cpu0收到cpu1要读取b的值
+cpu0CL->>cpu1: cpu0把最新的b=1给cpu1，同时修改自己的状态为S
+
+Note over cpu1 : cpu1判断b为1，跳出循环
+
+Note over cpu1 : cpu1遇到smp_mb，<br>现在不能执行， <br> 只能等待，<br>直到Invalidate Queue中的message <br> 被处理完成
+
+Note over cpu1 : CPU 1处理队列中缓存的<br>Invalidate消息，<br> 将a对应的cacheline <br> 设置为无效
+Note over cpu1 : cpu1执行assert(a==1),由于现在a无效，所以cpu1去cpu0获取a的最新值
+
+Note over cpu1 : cpu1再执行assert(a==1)就成功了</pre><hr><p>参考了很多文章，试着理解了下这个过程，若有不妥之处，请指正。</p><blockquote><p>简单的一个语句，cpu都做了这么多事，真是伟大的东西。</p></blockquote><h4 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h4><ul><li><a href="http://www.wanqing520.cn/201610/14/java/2016-10-14-java-lock.html" target="_blank" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">总线锁和缓存锁</a></li><li><a href="https://zhuanlan.zhihu.com/p/31875174" target="_blank" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">细说Cache-L1/L2/L3/TLB</a></li><li><a href="https://www.cnblogs.com/snow826520/p/8574824.html" target="_blank" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">CPU中的cache结构以及cache一致性</a></li><li><a href="https://zh.wikipedia.org/wiki/MESI%E5%8D%8F%E8%AE%AE" target="_blank" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">维基百科-MESI</a></li><li><a href="https://blog.csdn.net/fandroid/article/details/45969351" target="_blank" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">MESI协议－CPU缓存一致性协议</a></li><li><a href="https://blog.csdn.net/reliveIT/article/details/50450136" target="_blank" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">【并发编程】CPU cache结构和缓存一致性（MESI协议）</a></li><li><a href="https://www.cnblogs.com/yanlong300/p/8986041.html" target="_blank" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">CPU缓存一致性协议MESI</a> <em>这篇文章很不错</em></li><li><a href="https://zhuanlan.zhihu.com/p/66085562" target="_blank" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">内存屏障Memory Barrier: a Hardware View</a></li><li><a href="http://www.wowotech.net/kernel_synchronization/Why-Memory-Barriers.html" target="_blank" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">Why Memory Barriers？中文翻译（上）</a></li><li><a href="https://wudaijun.com/2019/04/cpu-cache-and-memory-model/" target="_blank" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">Cache一致性和内存模型</a></li></ul><script type="text&#x2F;javascript" src="https://unpkg.com/kity@2.0.4/dist/kity.min.js"></script><script type="text&#x2F;javascript" src="https://unpkg.com/kityminder-core@1.4.50/dist/kityminder.core.min.js"></script><script defer type="text&#x2F;javascript" src="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.js"></script><link rel="stylesheet" type="text&#x2F;css" href="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.css"></div><div><div id="wechat_subscriber" style="display:block;padding:10px 0;margin:20px auto;width:100%;text-align:center"><img id="wechat_subscriber_qcode" src="/images/wechat.jpg" alt="codelover wechat" style="width:200px;max-width:100%"><div>原创公众号</div></div></div><div><style>#rewardButton span{display:inline-block;width:80px;height:35px;border-radius:5px;color:#fff;font-weight:400;font-style:normal;font-variant:normal;font-stretch:normal;font-size:18px;font-family:"Microsoft Yahei";background:#f44336}#rewardButton{cursor:pointer;border:0;outline:0;border-radius:100%;padding:0;margin:0;letter-spacing:normal;text-transform:none;text-indent:0;text-shadow:none}</style><div style="padding:10px 0;margin:20px auto;width:90%;text-align:center"><div></div><button id="rewardButton" disable="enable" onclick='var qr=document.getElementById("QR");"none"===qr.style.display?qr.style.display="block":qr.style.display="none"'><span>赏</span></button><div id="QR" style="display:none"><div id="wechat" style="display:inline-block"><img id="wechat_qr" width="50%" height="50%" src="/images/reward.jpg" alt="codelover 微信支付"><p>微信支付</p></div></div></div></div><footer class="post-footer"><div class="post-tags"><a href="/tags/atomic/" rel="tag"><i class="fa fa-tag"></i> atomic</a> <a href="/tags/%E5%8E%9F%E5%AD%90/" rel="tag"><i class="fa fa-tag"></i> 原子</a> <a href="/tags/%E5%A4%9A%E6%A0%B8/" rel="tag"><i class="fa fa-tag"></i> 多核</a> <a href="/tags/%E9%94%81/" rel="tag"><i class="fa fa-tag"></i> 锁</a> <a href="/tags/MESI/" rel="tag"><i class="fa fa-tag"></i> MESI</a> <a href="/tags/%E7%BC%93%E5%AD%98%E4%B8%80%E8%87%B4%E6%80%A7/" rel="tag"><i class="fa fa-tag"></i> 缓存一致性</a> <a href="/tags/%E5%86%85%E5%AD%98%E5%B1%8F%E9%9A%9C/" rel="tag"><i class="fa fa-tag"></i> 内存屏障</a></div><div class="post-nav"><div class="post-nav-next post-nav-item"><a href="/redis-server/" rel="next" title="redis-服务端部分实现原理"><i class="fa fa-chevron-left"></i> redis-服务端部分实现原理</a></div><span class="post-nav-divider"></span><div class="post-nav-prev post-nav-item"><a href="/books/" rel="prev" title="编程资料汇总">编程资料汇总 <i class="fa fa-chevron-right"></i></a></div></div></footer></div><div><div><div style="text-align:center;color:#ccc;font-size:14px">-----若有不妥，敬请斧正-----</div></div></div></article><div class="post-spread"></div></div></div></div><div class="sidebar-toggle"><div class="sidebar-toggle-line-wrap"><span class="sidebar-toggle-line sidebar-toggle-line-first"></span> <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span> <span class="sidebar-toggle-line sidebar-toggle-line-last"></span></div></div><aside id="sidebar" class="sidebar"><div class="sidebar-inner"><ul class="sidebar-nav motion-element"><li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">文章目录</li><li class="sidebar-nav-overview" data-target="site-overview-wrap">站点概览</li></ul><section class="site-overview-wrap sidebar-panel"><div class="site-overview"><div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person"><img class="site-author-image" itemprop="image" src="/images/logo.png" alt="codelover"><p class="site-author-name" itemprop="name">codelover</p><p class="site-description motion-element" itemprop="description"></p></div><nav class="site-state motion-element"><div class="site-state-item site-state-posts"><a href="/archives/%7C%7C%20archive"><span class="site-state-item-count">7</span> <span class="site-state-item-name">日志</span></a></div><div class="site-state-item site-state-categories"><a href="/categories/index.html"><span class="site-state-item-count">7</span> <span class="site-state-item-name">分类</span></a></div><div class="site-state-item site-state-tags"><a href="/tags/index.html"><span class="site-state-item-count">25</span> <span class="site-state-item-name">标签</span></a></div></nav><div class="feed-link motion-element"><a href="/atom.xml" rel="alternate"><i class="fa fa-rss"></i> RSS</a></div><div class="links-of-author motion-element"><span class="links-of-author-item"><a href="https://github.com/lovercode" target="_blank" rel="external nofollow noopener noreferrer" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a> </span><span class="links-of-author-item"><a href="mailto:qiuleilove@gmail.com" target="_blank" rel="external nofollow noopener noreferrer" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a></span></div></div></section><section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active"><div class="post-toc"><div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#一段代码"><span class="nav-number">1.</span> <span class="nav-text">一段代码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#如何保证原子性？"><span class="nav-number">2.</span> <span class="nav-text">如何保证原子性？</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#加锁"><span class="nav-number">2.1.</span> <span class="nav-text">加锁</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#原子操作"><span class="nav-number">2.2.</span> <span class="nav-text">原子操作</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#性能有多少区别？"><span class="nav-number">3.</span> <span class="nav-text">性能有多少区别？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#原子操作到底变成了什么？"><span class="nav-number">4.</span> <span class="nav-text">原子操作到底变成了什么？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#lock发生了什么？"><span class="nav-number">5.</span> <span class="nav-text">lock发生了什么？</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#总线锁"><span class="nav-number">5.1.</span> <span class="nav-text">总线锁</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#缓存锁"><span class="nav-number">5.2.</span> <span class="nav-text">缓存锁</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#何时使用"><span class="nav-number">5.3.</span> <span class="nav-text">何时使用</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#缓存锁是什么原理？"><span class="nav-number">6.</span> <span class="nav-text">缓存锁是什么原理？</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#cpu和缓存的关系"><span class="nav-number">6.1.</span> <span class="nav-text">cpu和缓存的关系</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#cache写"><span class="nav-number">6.2.</span> <span class="nav-text">cache写</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#写通"><span class="nav-number">6.3.</span> <span class="nav-text">写通</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#写回"><span class="nav-number">6.4.</span> <span class="nav-text">写回</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#写失效（MESI）"><span class="nav-number">6.5.</span> <span class="nav-text">写失效（MESI）</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#写更新"><span class="nav-number">6.6.</span> <span class="nav-text">写更新</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MESI-–-维基百科"><span class="nav-number">7.</span> <span class="nav-text">MESI – 维基百科</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#状态图"><span class="nav-number">7.1.</span> <span class="nav-text">状态图</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#例子"><span class="nav-number">7.2.</span> <span class="nav-text">例子</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#似乎完美了？"><span class="nav-number">7.3.</span> <span class="nav-text">似乎完美了？</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Store-Bufferes"><span class="nav-number">7.4.</span> <span class="nav-text">Store Bufferes</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#新的问题"><span class="nav-number">7.5.</span> <span class="nav-text">新的问题</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#store-forwarding"><span class="nav-number">7.6.</span> <span class="nav-text">store forwarding</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#参考文章"><span class="nav-number">8.</span> <span class="nav-text">参考文章</span></a></li></ol></div></div></section><div id="aplayer-hjnObCgk" class="aplayer aplayer-tag-marker meting-tag-marker" data-id="4933107776" data-server="netease" data-type="playlist" data-order="random" data-lrctype="false" data-listfolded="true" data-fixed="false" data-autoplay="false" data-volume="0.4" data-mutex="true" data-listmaxheight="200px" data-preload="none" data-theme="#00b9f1"></div><div class="back-to-top"><i class="fa fa-arrow-up"></i> <span id="scrollpercent"><span>0</span>%</span></div><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5565422729000416" crossorigin="anonymous"></script></div></aside></div></main><footer id="footer" class="footer"><div class="footer-inner"><div class="copyright">&copy; <span itemprop="copyrightYear">2023</span> <span class="with-love"><i class="fa fa-user"></i> </span><span class="author" itemprop="copyrightHolder">codelover</span> <span class="post-meta-divider">|</span> <span class="post-meta-item-icon"><i class="fa fa-area-chart"></i> </span><span class="post-meta-item-text">Site words total count&#58;</span> <span title="Site words total count">9.3k</span></div><div class="footer-custom"><a target="_blank" href="https://beian.miit.gov.cn" target="_blank" rel="external nofollow noopener noreferrer">粤ICP备2022058819号</a></div><script src="https://unpkg.com/mermaid@7.1.2/dist/mermaid.min.js"></script><script>window.mermaid&&mermaid.initialize("")</script><div class="busuanzi-count"><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><span class="site-uv"><i class="fa fa-user"></i> <span class="busuanzi-value" id="busuanzi_value_site_uv"></span> </span><span class="site-pv"><i class="fa fa-eye"></i> <span class="busuanzi-value" id="busuanzi_value_site_pv"></span></span></div><script type="text/javascript">!function(){var e=document.createElement("script");e.src="//tajs.qq.com/stats?sId=66533329";var t=document.getElementsByTagName("script")[0];t.parentNode.insertBefore(e,t)}()</script></div></footer></div><script type="text/javascript">"[object Function]"!==Object.prototype.toString.call(window.Promise)&&(window.Promise=null)</script><script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script><script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script><script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script><script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script><script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script><script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script><script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script><script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script><script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script><script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script><script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script><script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script><script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script><script type="text/javascript">var isfetched=!1,isXml=!0,search_path="search.xml";0===search_path.length?search_path="search.xml":/json$/i.test(search_path)&&(isXml=!1);var path="/"+search_path,onPopupClose=function(t){$(".popup").hide(),$("#local-search-input").val(""),$(".search-result-list").remove(),$("#no-result").remove(),$(".local-search-pop-overlay").remove(),$("body").css("overflow","")};function proceedsearch(){$("body").append('<div class="search-popup-overlay local-search-pop-overlay"></div>').css("overflow","hidden"),$(".search-popup-overlay").click(onPopupClose),$(".popup").toggle();var t=$("#local-search-input");t.attr("autocapitalize","none"),t.attr("autocorrect","off"),t.focus()}var searchFunc=function(t,s,a){"use strict";$("body").append('<div class="search-popup-overlay local-search-pop-overlay"><div id="search-loading-icon"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i></div></div>').css("overflow","hidden"),$("#search-loading-icon").css("margin","20% auto 0 auto").css("text-align","center"),$.ajax({url:t,dataType:isXml?"xml":"json",async:!0,success:function(t){isfetched=!0,$(".popup").detach().appendTo(".header-inner");function e(){var m=n.value.trim().toLowerCase(),x=m.split(/[\s\-]+/);1<x.length&&x.push(m);var e,w=[];0<m.length&&o.forEach(function(t){var e=!1,o=0,h=0,n=t.title.trim(),r=n.toLowerCase(),s=t.content.trim().replace(/<[^>]+>/g,""),a=s.toLowerCase(),i=decodeURIComponent(t.url),c=[],l=[];if(""!=n&&(x.forEach(function(t){function e(t,e,o){var n=t.length;if(0===n)return[];var r,s=0,a=[];for(o||(e=e.toLowerCase(),t=t.toLowerCase());-1<(r=e.indexOf(t,s));)a.push({position:r,word:t}),s=r+n;return a}c=c.concat(e(t,r,!1)),l=l.concat(e(t,a,!1))}),(0<c.length||0<l.length)&&(e=!0,o=c.length+l.length)),e){function p(t,e,o,n){for(var r=n[n.length-1],s=r.position,a=r.word,i=[],c=0;s+a.length<=o&&0!=n.length;){a===m&&c++,i.push({position:s,length:a.length});var l=s+a.length;for(n.pop();0!=n.length&&(s=(r=n[n.length-1]).position,a=r.word,s<l);)n.pop()}return h+=c,{hits:i,start:e,end:o,searchTextCount:c}}[c,l].forEach(function(t){t.sort(function(t,e){return e.position!==t.position?e.position-t.position:t.word.length-e.word.length})});t=[];0!=c.length&&t.push(p(0,0,n.length,c));for(var u=[];0!=l.length;){var f=l[l.length-1],d=f.position,g=f.word,v=d-20,f=d+80;v<0&&(v=0),(f=f<d+g.length?d+g.length:f)>s.length&&(f=s.length),u.push(p(0,v,f,l))}u.sort(function(t,e){return t.searchTextCount!==e.searchTextCount?e.searchTextCount-t.searchTextCount:t.hits.length!==e.hits.length?e.hits.length-t.hits.length:t.start-e.start});e=parseInt("1");function $(o,t){var n="",r=t.start;return t.hits.forEach(function(t){n+=o.substring(r,t.position);var e=t.position+t.length;n+='<b class="search-keyword">'+o.substring(t.position,e)+"</b>",r=e}),n+=o.substring(r,t.end)}0<=e&&(u=u.slice(0,e));var C="";0!=t.length?C+="<li><a href='"+i+"' class='search-result-title'>"+$(n,t[0])+"</a>":C+="<li><a href='"+i+"' class='search-result-title'>"+n+"</a>",u.forEach(function(t){C+="<a href='"+i+'\'><p class="search-result">'+$(s,t)+"...</p></a>"}),C+="</li>",w.push({item:C,searchTextCount:h,hitCount:o,id:w.length})}}),1===x.length&&""===x[0]?r.innerHTML='<div id="no-result"><i class="fa fa-search fa-5x" /></div>':0===w.length?r.innerHTML='<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>':(w.sort(function(t,e){return t.searchTextCount!==e.searchTextCount?e.searchTextCount-t.searchTextCount:t.hitCount!==e.hitCount?e.hitCount-t.hitCount:e.id-t.id}),e='<ul class="search-result-list">',w.forEach(function(t){e+=t.item}),e+="</ul>",r.innerHTML=e)}var o=isXml?$("entry",t).map(function(){return{title:$("title",this).text(),content:$("content",this).text(),url:$("url",this).text()}}).get():t,n=document.getElementById(s),r=document.getElementById(a);n.addEventListener("input",e),$(".local-search-pop-overlay").remove(),$("body").css("overflow",""),proceedsearch()}})};$(".popup-trigger").click(function(t){t.stopPropagation(),!1===isfetched?searchFunc(path,"local-search-input","local-search-result"):proceedsearch()}),$(".popup-btn-close").click(onPopupClose),$(".popup").click(function(t){t.stopPropagation()}),$(document).on("keyup",function(t){27===t.which&&$(".search-popup").is(":visible")&&onPopupClose()})</script><script>!function(){var t=document.createElement("script"),e=window.location.protocol.split(":")[0];t.src="https"===e?"https://zz.bdstatic.com/linksubmit/push.js":"http://push.zhanzhang.baidu.com/push.js";e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(t,e)}()</script><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({model:{jsonPath:"/live2dw/assets/hijiki.model.json"},display:{position:"left",width:150,height:300},mobile:{show:!1},log:!1,pluginJsPath:"lib/",pluginModelPath:"assets/",pluginRootPath:"live2dw/",tagMode:!1})</script></body></html>

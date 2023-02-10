@@ -1,0 +1,726 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>mlzs</title>
+    <url>/mlzs/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><pre class="mermaid">graph TD
+
+subgraph data
+    node1
+    node2
+    node3
+    node4
+    node5
+    otherIndex
+    defaultIndex
+
+end
+
+subgraph dataDetail
+    val 
+    indexs
+end
+
+node1 --> val
+
+subgraph 默认索引
+    i1_node1(node1) 
+    i1_node2(node2) 
+    i1_node3(node3) 
+    i1_node4(node4) 
+    i1_node5(node5) 
+end
+
+
+subgraph 业务索引1
+    i2_node1(node1) 
+    i2_node2(node2) 
+    i2_node3(node3) 
+end
+
+
+subgraph 业务索引2
+    i3_node1(node1) 
+    i3_node2(node4) 
+    i3_node3(node5) 
+end
+
+
+
+i1_node1 --> i1_node3
+i1_node2--> i1_node4
+i1_node2--> i1_node5
+i1_node1 --> i1_node2
+
+
+i2_node1 --> i2_node3
+i2_node1 --> i2_node2
+
+
+i3_node1 --> i3_node3
+i3_node1 --> i3_node2
+
+indexs -.-> i2_node1
+indexs -.-> i3_node1
+
+
+otherIndex --> i2_node1
+otherIndex --> i3_node1
+defaultIndex --> i1_node1</pre><script type="text&#x2F;javascript" src="https://unpkg.com/kity@2.0.4/dist/kity.min.js"></script><script type="text&#x2F;javascript" src="https://unpkg.com/kityminder-core@1.4.50/dist/kityminder.core.min.js"></script><script defer="true" type="text&#x2F;javascript" src="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.js"></script><link rel="stylesheet" type="text&#x2F;css" href="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.css">]]></content>
+  </entry>
+  <entry>
+    <title>协程到底是什么</title>
+    <url>/coroutine/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><blockquote><p>协程到底是什么？跟</p></blockquote><h1 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h1><script type="text&#x2F;javascript" src="https://unpkg.com/kity@2.0.4/dist/kity.min.js"></script><script type="text&#x2F;javascript" src="https://unpkg.com/kityminder-core@1.4.50/dist/kityminder.core.min.js"></script><script defer="true" type="text&#x2F;javascript" src="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.js"></script><link rel="stylesheet" type="text&#x2F;css" href="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.css">]]></content>
+      <categories>
+        <category>协程</category>
+      </categories>
+      <tags>
+        <tag>进程</tag>
+        <tag>线程</tag>
+        <tag>协程</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>epoll的原理和应用</title>
+    <url>/epoll/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><blockquote><p>本文介绍epoll的原理，以及各种实际的例子。</p></blockquote><h1 id="系统延时对比"><a href="#系统延时对比" class="headerlink" title="系统延时对比"></a>系统延时对比</h1><ul><li>首先了解下各种操作的延时对比（《性能之巅峰》）</li><li>以 <code>3.3GHz</code> 的CPU为例， <code>1/3.3G=0.3ns</code></li></ul><table><thead><tr><th>事件</th><th>延时</th><th>相对时间</th></tr></thead><tbody><tr><td>1个cpu周期</td><td>0.3ns</td><td>1s</td></tr><tr><td>L1</td><td>0.9ns</td><td>3s</td></tr><tr><td>L2</td><td>2.8ns</td><td>9s</td></tr><tr><td>L3</td><td>12.8ns</td><td>43s</td></tr><tr><td>内存</td><td>120ns</td><td>6min</td></tr><tr><td>固态</td><td>50-160ns</td><td>2-6day</td></tr><tr><td>机械</td><td>1-10ms</td><td>1-12mon</td></tr><tr><td>网络 旧金山-&gt;纽约</td><td>40ms</td><td>4year</td></tr><tr><td>网络 旧金山-&gt;英国</td><td>81ms</td><td>8year</td></tr><tr><td>网络 旧金山-&gt;澳大利亚</td><td>183ms</td><td>19year</td></tr><tr><td>tcp包重传</td><td>1-3s</td><td>105-317year</td></tr><tr><td>os虚拟化系统重启</td><td>4s</td><td>423year</td></tr><tr><td>…</td><td></td><td></td></tr><tr><td>物理系统重启</td><td>5min</td><td>32000year</td></tr></tbody></table><ul><li>一级缓存大约3个时钟周期</li><li>二级缓存大约9个时钟周期</li><li>内存大约360个时钟周期</li><li>可见磁盘io，网络io的耗时和内存访问的差距是十分大的</li><li>直观的感受，一个cpu周期，光只能走0.5米。可能眼睛到书的这段距离，光需要1.7ns，但是cpu已经执行了5个cpu周期了</li></ul><blockquote><p>可见访问不同的存储介质，延时有很大的差别，对于io密集型的应用，比如web服务器，网络rpc，如何让io更高效就成了关键，这里主要探讨的是网络io。</p></blockquote><hr><h1 id="五种io模型"><a href="#五种io模型" class="headerlink" title="五种io模型"></a>五种io模型</h1><h2 id="同步io"><a href="#同步io" class="headerlink" title="同步io"></a>同步io</h2><h3 id="阻塞io（BIO）"><a href="#阻塞io（BIO）" class="headerlink" title="阻塞io（BIO）"></a>阻塞io（BIO）</h3><pre class="mermaid">sequenceDiagram
+participant 进程
+participant 内核
+opt 整个过程都阻塞
+    进程 ->> 内核: recvfrom
+    内核 ->> 内核: 挂起进程，等待数据ok
+
+    Note over 内核: 数据ok
+    Note over 内核: 拷贝到进程空间
+    内核 ->> 进程: 读到数据
+    进程 ->> 进程: 处理数据
+end</pre><ul><li>阻塞io，在进程发起read调用后就进入阻塞挂起，直到对端发来数据，并且内核处理完后拷贝到用户进程空间，此时read函数才返回。</li><li>可见阻塞io的效率很低，如果进程只有一个线程，那么整个过程会导致进程阻塞在read系统调用上，无法响应其他用户请求。</li></ul><h3 id="非阻塞io（NIO）"><a href="#非阻塞io（NIO）" class="headerlink" title="非阻塞io（NIO）"></a>非阻塞io（NIO）</h3><pre class="mermaid">sequenceDiagram
+participant 进程
+participant 内核
+loop 轮询检查多个fd
+    进程 ->> 内核: recvfrom fd=1
+    内核 ->> 进程: 没有数据
+    进程 ->> 进程: do other
+    进程 ->> 内核: recvfrom fd=2
+    内核 ->> 进程: 没有数据
+end
+进程 ->> 内核: recvfrom fd=1
+    Note over 内核: 数据ok
+opt 阻塞
+    Note over 内核: 拷贝到进程空间
+end
+内核 ->> 进程: 读到数据
+进程 ->> 进程: 处理数据</pre><ul><li>首先进程会在fd上设置非阻塞的标志，然后调read系统调用，此时和阻塞io不同的是如果数据没准备好，会直接返回错误，这样用户进程就没有阻塞了，可以去做其他的事情，过一段时间再来轮询</li><li>本质上是轮询，只不过进程读不到数据可以继续做其他事情，比如轮询其他fd，或者给其他连接回包，这样的话不会因为某个连接阻塞而无法处理其他的</li></ul><h3 id="io复用"><a href="#io复用" class="headerlink" title="io复用"></a>io复用</h3><pre class="mermaid">sequenceDiagram
+participant 进程
+participant 内核
+
+
+进程 ->> 内核: poll 同时监听多个fd
+opt 阻塞
+    内核 ->> 内核: 等待多个fd数据准备好
+    Note over 内核: 数据ok
+end
+内核 ->> 进程: 数据ok
+进程 ->> 内核: recvfrom
+opt 阻塞
+    Note over 内核: 拷贝到进程空间
+end
+内核 ->> 进程: 读到数据
+进程 ->> 进程: 处理数据</pre><ul><li>似乎这里阻塞的时间又变多了，和阻塞io类似，只不过分成了两段，但实际上这里效率更高了，阻塞io是阻塞在单个fd上，这里是多个fd</li><li>并且，第一个阻塞的操作是可以设置最长等待时间的，也就是epoll_wait可以指定阻塞最长的时间，到了时间后便会返回，这里往往应用在定时器上，可以实现一个高精度的定时器，比如redis在实现的时候就是在这里加上定时器的逻辑，还有其他的用户态协程库的实现一般也是这样。</li></ul><h3 id="信号io"><a href="#信号io" class="headerlink" title="信号io"></a>信号io</h3><pre class="mermaid">sequenceDiagram
+participant 进程
+participant 内核
+
+
+进程 ->> 内核: 注册信号
+内核 ->> 进程: 返回
+进程 ->> 进程: do other
+Note over 内核: 数据ok
+内核 ->> 进程: 通过信号通知进程
+进程 ->> 内核: recvfrom
+opt 阻塞
+    Note over 内核: 拷贝到进程空间
+end
+内核 ->> 进程: 读到数据
+进程 ->> 进程: 处理数据</pre><ul><li>tcp会产生信号的有<ul><li>监听套接字上某个连接请求已经完成；</li><li>某个断连请求发起</li><li>某个断连请求完成</li><li>某个连接已经关闭</li><li>数据到达套接字</li><li>数据已经从套接字发送走</li><li>发生某个异步错误</li></ul></li><li>udp会产生信号的有<ul><li>数据报到达套接字</li><li>套接字上发生异步错误</li></ul></li><li>可见tcp产生信号的原因太多，判断起来很费资源，不太适合使用信号io</li></ul><h2 id="异步io"><a href="#异步io" class="headerlink" title="异步io"></a>异步io</h2><h3 id="异步io（AIO）"><a href="#异步io（AIO）" class="headerlink" title="异步io（AIO）"></a>异步io（AIO）</h3><pre class="mermaid">sequenceDiagram
+participant 进程
+participant 内核
+
+
+进程 ->> 内核: aio_read
+内核 ->> 进程: 返回
+进程 ->> 进程: do other
+opt 内核异步
+Note over 内核: 数据ok
+Note over 内核: 拷贝到进程空间
+end
+内核 ->> 进程: 信号通知
+进程 ->> 进程: 处理数据</pre><ul><li>只有异步io模型是异步io，其他的都是同步io，只不过可以设置非阻塞模式</li><li>异步io</li></ul><hr><h1 id="为什么要用epoll"><a href="#为什么要用epoll" class="headerlink" title="为什么要用epoll"></a>为什么要用epoll</h1><h2 id="网络io是非常耗时的"><a href="#网络io是非常耗时的" class="headerlink" title="网络io是非常耗时的"></a>网络io是非常耗时的</h2><ul><li>从上面的系统延时对比可以看出，网络io是非常耗时的，通常在几十毫秒以上，所以如何处理并发的请求就是关键</li></ul><h2 id="不使用epoll也能处理"><a href="#不使用epoll也能处理" class="headerlink" title="不使用epoll也能处理"></a>不使用epoll也能处理</h2><ul><li>是的，不使用epoll也能处理并发的请求，每个线程处理一个fd也能并发，但是问题在于linux每个线程栈大小默认是8m，成千上万的fd不可能每个都分配一个线程，线程数过多还会导致上下文频繁切换，导致cpu都耗费在了上线文切换上，实际效率很低</li></ul><h2 id="epoll的好处"><a href="#epoll的好处" class="headerlink" title="epoll的好处"></a>epoll的好处</h2><ul><li>select有fd上限，默认2048，并且select需要自己判断fd是否活跃，扫描是O(n)的复杂度</li><li>poll链表实现监听fd没上限，但也要扫描全部的fd，复杂度O(n)</li><li>epoll监听fd没有上限，并且epoll是直接返回所有的活跃的fd，用户空间直接拿到fd进行操作就行，epoll内部使用红黑树，内部复杂度是O(logn)，用户空间不用轮询，复杂度O(1)</li></ul><h1 id="epoll的应用"><a href="#epoll的应用" class="headerlink" title="epoll的应用"></a>epoll的应用</h1><ul><li>epoll的应用基本都是通过事件反应堆来实现的，基本思路就是</li><li>把fd和对应的handle函数绑定在一起，因为系统的epoll会提供一个指针，这个指针在fd就绪会一起返回，所以一般会使用这个指针来保存私有的数据，比如事件对应的处理handle，这个handle在处理的时候，同时会根据业务逻辑需要来创建另外一个事件，再把这个fd进行注册，直到某一次事件被回调后不再需要注册新的事件，那么这个fd的反应堆就完成了。大致流程是</li></ul><pre class="mermaid">graph LR
+
+fd绑定handle --> 注册到epoll 
+注册到epoll --> epoll_wait返回 
+epoll_wait返回 --> 回调handle 
+ 回调handle --> c{是否创建新的事件?}
+c --yes--> fd绑定handle
+c --no--> 释放fd</pre><ul><li>epoll_wait可以支持设置毫秒级别的阻塞时间，因此通常epoll也用在实现精确的定时任务。</li></ul><h2 id="redis中的epoll"><a href="#redis中的epoll" class="headerlink" title="redis中的epoll"></a>redis中的epoll</h2><h3 id="redis统一的ae接口定义"><a href="#redis统一的ae接口定义" class="headerlink" title="redis统一的ae接口定义"></a>redis统一的ae接口定义</h3><ul><li>redis中把select，epoll，kqueue等系统提供的接口抽象成了统一的接口，在ae.h中可以找到定义。</li><li>redis的实现思路也是和上面的流程一致，基于事件反应堆实现的，并且redis的源码可读性特别高，读起来特别舒服，十分推荐</li></ul><h3 id="redis中的场景"><a href="#redis中的场景" class="headerlink" title="redis中的场景"></a>redis中的场景</h3><ul><li>读写用户请求（好像有点废话了）</li><li>定时任务</li></ul><h3 id="redis的epoll部分实现逻辑"><a href="#redis的epoll部分实现逻辑" class="headerlink" title="redis的epoll部分实现逻辑"></a>redis的epoll部分实现逻辑</h3><ul><li><p>redis一开始都是单线程的，根据上面的流程图，可以想象假如在处理单个用户的fd的handle函数的时候，阻塞太长时间，比如可能回一个很大的包，这就有可能阻塞住，由于是单线程的，阻塞的就是整个进程，导致其他客户端也阻塞了，所以redis在write的时候，会检查阻塞的时间，如果超过某个阈值则会直接break掉训循环，下次再写</p></li><li><p>redis的设计，cpu往往不是瓶颈，主要可能在内存和网络io上遇到瓶颈，针对网络io，事件堆模型已经能处理大多数的场景，但是redis在6.0后还是进行了优化，采用了多线程的模式进行网络io，这样可以充分利用多核处理器。</p></li></ul><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ul><li>epoll是网络编程中的利器，广泛应用在各种开源软件，各种rpc框架中，熟悉原理很有必要，redis中的实现十分不错，非常值得用来学习epoll的原理。</li></ul><script type="text&#x2F;javascript" src="https://unpkg.com/kity@2.0.4/dist/kity.min.js"></script><script type="text&#x2F;javascript" src="https://unpkg.com/kityminder-core@1.4.50/dist/kityminder.core.min.js"></script><script defer="true" type="text&#x2F;javascript" src="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.js"></script><link rel="stylesheet" type="text&#x2F;css" href="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.css">]]></content>
+      <categories>
+        <category>epoll</category>
+        <category>linux</category>
+      </categories>
+      <tags>
+        <tag>epoll</tag>
+        <tag>事件反应堆</tag>
+        <tag>io</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>编程资料汇总</title>
+    <url>/books/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><blockquote><p>持续更新…</p></blockquote><h4 id="编程资料汇总"><a href="#编程资料汇总" class="headerlink" title="编程资料汇总"></a>编程资料汇总</h4><h5 id="书籍"><a href="#书籍" class="headerlink" title="书籍"></a>书籍</h5><blockquote class="pullquote mindmap mindmap-lg"><ul><li>编程书籍推荐<ul><li><a href="https://github.com/ruanyf/free-books" target="_blank" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">github互联网上的免费书籍</a></li><li><a href="https://github.com/justjavac/free-programming-books-zh_CN" target="_blank" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">github免费的编程中文书籍索引</a></li></ul></li></ul></blockquote><h5 id="ppt"><a href="#ppt" class="headerlink" title="ppt"></a>ppt</h5><blockquote class="pullquote mindmap mindmap-lg"><ul><li>ppt<ul><li><a href="https://github.com/xingshaocheng/architect-awesome" target="_blank" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">《后端架构师技术图谱》</a></li></ul></li></ul></blockquote><h5 id="视频"><a href="#视频" class="headerlink" title="视频"></a>视频</h5><blockquote class="pullquote mindmap mindmap-lg"><ul><li>视频</li></ul></blockquote><script type="text&#x2F;javascript" src="https://unpkg.com/kity@2.0.4/dist/kity.min.js"></script><script type="text&#x2F;javascript" src="https://unpkg.com/kityminder-core@1.4.50/dist/kityminder.core.min.js"></script><script defer="true" type="text&#x2F;javascript" src="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.js"></script><link rel="stylesheet" type="text&#x2F;css" href="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.css">]]></content>
+      <categories>
+        <category>资料</category>
+      </categories>
+      <tags>
+        <tag>编程书籍</tag>
+        <tag>ppt</tag>
+        <tag>架构资料</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>浅谈原子操作的实现原理</title>
+    <url>/atomic/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><blockquote><p>引言：编程中，经常遇到并发处理的时候，一般我们采用多线程，对于一些涉及多线程处理内存空间，一般我们会采用加锁，让每次只能有一个线程进行操作；当然还有采用原子操作的方式。主要目的就是保证我们多个线程对同一块内存的操作是串行的，不会因为并发操作把内存写的不符合预期。那么，这种原子操作具体是怎么实现的呢？</p></blockquote><h4 id="一段代码"><a href="#一段代码" class="headerlink" title="一段代码"></a>一段代码</h4><ul><li>先看一段代码</li></ul><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> NUM_THREADS 4</span></span><br><span class="line"><span class="keyword">int</span> global_num;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">void</span>* <span class="title">run</span><span class="params">(<span class="keyword">void</span>* args)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;<span class="number">100000000</span>; i++)&#123;</span><br><span class="line">        global_num++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">pthread_t</span> tids[NUM_THREADS];</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; NUM_THREADS; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        pthread_create(&amp;tids[i], <span class="literal">NULL</span>, run, <span class="literal">NULL</span>);</span><br><span class="line">        pthread_join (tids[i], <span class="literal">NULL</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><ul><li>多线程下，<code>global_num</code>的值是无法预期的</li></ul><h4 id="如何保证原子性？"><a href="#如何保证原子性？" class="headerlink" title="如何保证原子性？"></a>如何保证原子性？</h4><ul><li>加锁</li><li>原子操作</li></ul><h5 id="加锁"><a href="#加锁" class="headerlink" title="加锁"></a>加锁</h5><ul><li>上面的代码，我们采用加锁的方式的话，一般会这样操作。<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">std</span>::mutex g_mutex;</span><br><span class="line"><span class="function"><span class="keyword">void</span>* <span class="title">run</span><span class="params">(<span class="keyword">void</span>* args)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;<span class="number">100000000</span>; i++)&#123;</span><br><span class="line">        g_mutex.lock();</span><br><span class="line">        global_num++;</span><br><span class="line">        g_mutex.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li><li>这样便保证了每一个线程在操作变量的时候都是独占的，线程间不会相互影响。</li></ul><h5 id="原子操作"><a href="#原子操作" class="headerlink" title="原子操作"></a>原子操作</h5><ul><li>当然还有一种更高效的方式，是使用原子操作<figure class="highlight angelscript"><table><tr><td class="code"><pre><span class="line"><span class="built_in">void</span>* run(<span class="built_in">void</span>* args)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="built_in">int</span> i=<span class="number">0</span>; i&lt;<span class="number">100000000</span>; i++)&#123;</span><br><span class="line">        __sync_fetch_and_add(&amp;global_num,<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li></ul><h4 id="性能有多少区别？"><a href="#性能有多少区别？" class="headerlink" title="性能有多少区别？"></a>性能有多少区别？</h4><ul><li><p>通过<code>4</code>个线程执行<code>1亿</code>次纯<code>i++</code>运算，通过时间来看性能差别</p></li><li><p>加锁</p><figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line">400000000(运算结果)</span><br><span class="line"></span><br><span class="line">real    0m10.035s</span><br><span class="line">user    0m10.030s</span><br><span class="line">sys     0m0.004s</span><br></pre></td></tr></table></figure></li><li><p>原子操作</p><figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line">400000000</span><br><span class="line"></span><br><span class="line">real    0m2.427s</span><br><span class="line">user    0m2.420s</span><br><span class="line">sys     0m0.004s</span><br></pre></td></tr></table></figure></li><li><p>我的机器是i5 4核，目前跑出来加锁耗时10s，原子操作耗时2s，相差在5倍左右</p></li></ul><h4 id="原子操作到底变成了什么？"><a href="#原子操作到底变成了什么？" class="headerlink" title="原子操作到底变成了什么？"></a>原子操作到底变成了什么？</h4><ul><li>通过<code>g++ -S -o atomic.s thread_with_atomic.cpp -lpthread</code>编译成汇编代码，得到了下面对<code>run</code>函数的实现<figure class="highlight armasm"><table><tr><td class="code"><pre><span class="line"><span class="symbol">_Z3runPv</span>:</span><br><span class="line">    <span class="keyword">pushq	</span>%rbp</span><br><span class="line">    <span class="keyword">movq	</span>%rsp, %rbp</span><br><span class="line">    <span class="keyword">movq	</span>%rdi, -<span class="number">24</span>(%rbp)</span><br><span class="line">    <span class="keyword">movl	</span><span class="number">$0</span>, -<span class="number">4</span>(%rbp)</span><br><span class="line"><span class="symbol">.L3</span>:</span><br><span class="line">    <span class="keyword">cmpl	</span><span class="number">$99999999</span>, -<span class="number">4</span>(%rbp)</span><br><span class="line">    jg	.L2</span><br><span class="line">    lock <span class="keyword">addl	</span><span class="number">$1</span>, global_num(%rip)</span><br><span class="line">    <span class="keyword">addl	</span><span class="number">$1</span>, -<span class="number">4</span>(%rbp)</span><br><span class="line">    jmp	.L3</span><br><span class="line"><span class="symbol">.L2</span>:</span><br><span class="line">    <span class="keyword">movl	</span><span class="number">$0</span>, %eax</span><br><span class="line">    <span class="keyword">popq	</span>%rbp</span><br><span class="line">    ret</span><br></pre></td></tr></table></figure></li><li>核心的一句是<code>lock addl $1, global_num(%rip)</code></li></ul><h4 id="lock发生了什么？"><a href="#lock发生了什么？" class="headerlink" title="lock发生了什么？"></a><code>lock</code>发生了什么？</h4><h5 id="总线锁"><a href="#总线锁" class="headerlink" title="总线锁"></a>总线锁</h5><p>早期的时候，当cpu执行lock指令的时候，会直接进行总线锁，就是把总线锁住，这样cpu和内存之间就不能进行通信，如果多核cpu，就出现了一核工作，多核围观的尴尬局面，此时就会出现严重的资源浪费问题，开销比较大。</p><h5 id="缓存锁"><a href="#缓存锁" class="headerlink" title="缓存锁"></a>缓存锁</h5><p>后面有了缓存锁，缓存锁不再锁总线，而是在写回内存时，通过一致性机制来保证一个时刻只有一个核心能修改指定的内存区域。</p><h5 id="何时使用"><a href="#何时使用" class="headerlink" title="何时使用"></a>何时使用</h5><p>有些场景是不能使用的缓存锁的，只能进行总线锁</p><ul><li>当操作的数据不能被缓存在处理器内部</li><li>跨多个缓存行操作</li><li>处理器不支持</li></ul><h4 id="缓存锁是什么原理？"><a href="#缓存锁是什么原理？" class="headerlink" title="缓存锁是什么原理？"></a>缓存锁是什么原理？</h4><p>总线锁很好理解，通过锁住cpu和内存通信，并阻塞cpu执行指令完成。但是缓存锁呢？这就需要了解一下<strong>缓存一致性</strong>了。</p><h5 id="cpu和缓存的关系"><a href="#cpu和缓存的关系" class="headerlink" title="cpu和缓存的关系"></a>cpu和缓存的关系</h5><pre class="mermaid">graph TD
+subgraph Cpu
+    subgraph Cpu1
+        cpu1(cpu1) --> cache1(L1)
+        cache1 --> cache12(L2)
+    end
+        cache12 --> cacheShare(L3)
+    subgraph Cpu2    
+        cpu2(cpu2) --> cache2(L1)
+        cache2 --> cache22(L2)    
+    end
+        cache22 --> cacheShare(L3)
+    subgraph Cpu3
+        cpu3(cpu3) --> cache3(L1)
+        cache3 --> cache32(L2)
+    end
+        cache32 --> cacheShare(L3)
+    subgraph Cpu4
+        cpu4(cpu4) --> cache4(L1)
+        cache4 --> cache42(L2)
+    end
+        cache42 --> cacheShare(L3)
+end
+    cacheShare(L3) --总线--> mem(内存)</pre><p>首先了解下cpu，缓存，内存之间的关系，大致是这样的，1,2级缓存cpu独享，3级缓存共享，共享物理内存。<br>每个核心都有自己的cache，那么如何保证cpu之间的数据一致呢?</p><h5 id="cache写"><a href="#cache写" class="headerlink" title="cache写"></a>cache写</h5><h5 id="写通"><a href="#写通" class="headerlink" title="写通"></a>写通</h5><ul><li>每次cpu修改了cache中的内容，都会立即写入内存，高一致性，但是效率不高。</li></ul><h5 id="写回"><a href="#写回" class="headerlink" title="写回"></a>写回</h5><ul><li>每次cpu修改了cache中的内容，不会立即写入内存。</li></ul><h5 id="写失效（MESI）"><a href="#写失效（MESI）" class="headerlink" title="写失效（MESI）"></a>写失效（MESI）</h5><ul><li>当一个cpu已经修改了数据，如果其他cpu有数据，则通知其修改。</li></ul><h5 id="写更新"><a href="#写更新" class="headerlink" title="写更新"></a>写更新</h5><ul><li>当一个cpu已经修改了数据，如果其他CPU有该数据，则通知其跟新数据。</li></ul><h4 id="MESI-–-维基百科"><a href="#MESI-–-维基百科" class="headerlink" title="MESI – 维基百科"></a>MESI <em><a href="https://zh.wikipedia.org/wiki/MESI%E5%8D%8F%E8%AE%AE" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">– 维基百科</a></em></h4><ul><li><strong>已修改Modified (M)</strong><br>缓存行是脏的（dirty），与主存的值不同。如果别的CPU内核要读主存这块数据，该缓存行必须回写到主存，状态变为共享(S).</li><li><strong>独占Exclusive (E)</strong><br>缓存行只在当前缓存中，但是干净的（clean）–缓存数据同于主存数据。当别的缓存读取它时，状态变为共享；当前写数据时，变为已修改状态。</li><li><strong>共享Shared (S)</strong><br>缓存行也存在于其它缓存中且是干净的。缓存行可以在任意时刻抛弃。</li><li><strong>无效Invalid (I)</strong><br>缓存行是无效的</li></ul><ul><li><strong>任意一对缓存，对应缓存行的相容关系:</strong> <em><a href="https://zh.wikipedia.org/wiki/MESI%E5%8D%8F%E8%AE%AE" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">– 维基百科</a></em></li></ul><table><thead><tr><th></th><th>已修改M</th><th>独占E</th><th>共享S</th><th>无效I</th></tr></thead><tbody><tr><td>已修改M</td><td>x</td><td>x</td><td>x</td><td>o</td></tr><tr><td>独占E</td><td>x</td><td>x</td><td>x</td><td>o</td></tr><tr><td>共享S</td><td>x</td><td>x</td><td>o</td><td>o</td></tr><tr><td>无效I</td><td>o</td><td>o</td><td>o</td><td>o</td></tr></tbody></table><blockquote><p>当块标记为 M (已修改), 在其他缓存中的数据副本被标记为I(无效)</p></blockquote><h5 id="状态图"><a href="#状态图" class="headerlink" title="状态图"></a>状态图</h5><p>上面的表可以用状态图来表示，如下</p><ul><li>M:修改</li><li>S:共享</li><li>E:独享</li><li>I:无效</li><li>LR:Local Read 本地cache读取本地cache</li><li>LW:Local Write 本地cache写入本地cache</li><li>RR:Remote Read 其他cache读取本地cache</li><li>RW:Remote Write 其他cache写入本地cache</li></ul><pre class="mermaid">graph LR
+
+subgraph Modified
+M((M,修改))
+end
+subgraph Shared
+S((S,共享))
+end
+subgraph Exclusive
+E((E,独享))
+end
+subgraph Invalid
+I((I,无效))
+end
+
+
+
+M --LR本地读--> M
+M --RR其他读--> M
+M --RW其他写--> I
+M --RR其他读--> S
+
+I --LW本地写--> M
+I --LR本地读--> E
+
+E --RW其他写--> I
+E --LR本地读--> E
+E --RR其他读--> S
+E --LW本地写--> M
+
+S --LR本地读--> S
+S --RR其他读--> S
+S --LW本地写--> M
+S --RW其他写--> I</pre><h5 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h5><ul><li>初始化</li></ul><pre class="mermaid">graph TD
+subgraph Cpu
+    subgraph Cpu1
+       cacheLine(cacheLine)
+    end
+    subgraph Cpu2
+       cacheLine1(cacheLine)
+    end
+    subgraph Cpu3
+       cacheLine2(cacheLine)
+    end
+end
+cacheLine --- bus(总线)
+cacheLine1 --- bus(总线)
+cacheLine2 --- bus(总线)
+bus --- mem(内存<br>x=0)
+style mem fill:red</pre><ul><li>cpu1读取</li></ul><pre class="mermaid">graph TD
+subgraph Cpu
+    subgraph Cpu1
+       cacheLine(cacheLine<br>x=0<br>E,独占)
+       style cacheLine fill:red
+    end
+    subgraph Cpu2
+       cacheLine1(cacheLine)
+    end
+    subgraph Cpu3
+       cacheLine2(cacheLine)
+    end
+end
+cacheLine --- bus(总线)
+cacheLine1 --- bus(总线)
+cacheLine2 --- bus(总线)
+bus --- 内存(内存<br>x=0)</pre><ul><li>cpu2读取</li></ul><p>cpu2读取，此时cpu1处于监听中，当他发现cpu2要读的地址是自己的cacheline中的，所以cpu1做出响应，把数据给cpu2<br>cpu1在E收到RR，E–&gt;S</p><pre class="mermaid">graph TD
+subgraph Cpu
+    subgraph Cpu1
+       cacheLine(cacheLine<br>x=0<br>S,共享)
+       style cacheLine fill:red
+    end
+    subgraph Cpu2
+       cacheLine1(cacheLine<br>x=0<br>S,共享)
+       style cacheLine1 fill:red
+    end
+    subgraph Cpu3
+       cacheLine2(cacheLine)
+    end
+end
+cacheLine --- bus(总线)
+cacheLine1 --- bus(总线)
+cacheLine2 --- bus(总线)
+bus --- 内存(内存<br>x=0)</pre><ul><li>cpu1修改</li></ul><p>cpu1在S收到LW，S–&gt;M<br>cpu2在S收到RW，S–&gt;I</p><pre class="mermaid">graph TD
+subgraph Cpu
+    subgraph Cpu1
+       cacheLine(cacheLine<br>x=1<br>M,修改)
+       style cacheLine fill:red
+    end
+    subgraph Cpu2
+       cacheLine1(cacheLine<br>x=0<br>I,无效)
+       style cacheLine1 fill:red
+    end
+    subgraph Cpu3
+       cacheLine2(cacheLine)
+    end
+end
+cacheLine --- bus(总线)
+cacheLine1 --- bus(总线)
+cacheLine2 --- bus(总线)
+bus --- 内存(内存<br>x=0)</pre><ul><li>cpu2读取</li></ul><p>cpu2读取的时候<br>cpu1在M收到远程读，此时会把cache的值写入内存，从M–&gt;S<br>cpu2在I收到LR，从I–&gt;S</p><pre class="mermaid">graph TD
+subgraph Cpu
+    subgraph Cpu1
+       cacheLine(cacheLine<br>x=1<br>S,共享)
+       style cacheLine fill:red
+    end
+    subgraph Cpu2
+       cacheLine1(cacheLine<br>x=1<br>S,共享)
+       style cacheLine1 fill:red
+    end
+    subgraph Cpu3
+       cacheLine2(cacheLine)
+    end
+end
+cacheLine --- bus(总线)
+cacheLine1 --- bus(总线)
+cacheLine2 --- bus(总线)
+bus --- mem(内存<br>x=1)
+style mem fill:red</pre><h5 id="似乎完美了？"><a href="#似乎完美了？" class="headerlink" title="似乎完美了？"></a>似乎完美了？</h5><p>这样是不是就完美了？其实不是的，当cpu1切换状态的时候，此时，cpu1需要通知其他所有cpu，让其他cpu进行确认，并且在发出消息，接收所有cpu回应这一段时间，cpu1可能出现阻塞的情况，导致性能不佳，这样的情况又要怎么处理？</p><pre class="mermaid">sequenceDiagram
+participant cpu1
+participant cpu2
+participant cpu3
+participant cpu4
+
+cpu1->> + cpu2:invalidate
+cpu1->>  cpu3:invalidate
+cpu1->>  cpu4:invalidate
+
+cpu2->>  cpu1:ack
+cpu3->>  cpu1:ack
+cpu4->> - cpu1:ack
+Note over cpu1,cpu4 : 阻塞至其他cpu全部确认
+cpu1->>cpu1:执行其他指令</pre><h5 id="Store-Bufferes"><a href="#Store-Bufferes" class="headerlink" title="Store Bufferes"></a>Store Bufferes</h5><p>为了避免上述的情况导致cpu1阻塞，cpu引入的Store Bufferes，原理就是当cpu要等待其他cpu的确认的时候，先把修改后的值写入Store Bufferes，等待其他所有cpu的响应，此时可以去处理其他事，当所有确认都收到，再把数据提交。</p><pre class="mermaid">graph TD
+subgraph Cpu
+    cpu0
+    buff(Store Bufferes)
+    cache
+
+    cpu0 --> buff
+    buff --> cache
+    cache --> cpu0
+end</pre><h5 id="新的问题"><a href="#新的问题" class="headerlink" title="新的问题"></a>新的问题</h5><figure class="highlight nix"><table><tr><td class="code"><pre><span class="line"><span class="attr">a=1;</span></span><br><span class="line"><span class="attr">b=a+1；</span></span><br><span class="line"><span class="keyword">assert</span>(<span class="attr">b</span> == <span class="number">2</span>)</span><br></pre></td></tr></table></figure><pre class="mermaid">sequenceDiagram
+participant cpu0
+participant cpu0SB
+Note over cpu0SB:  cpu0的Store Bufferes
+participant cpu0CL
+Note over cpu0CL: cpu0的cacheLine b=0
+participant cpu1
+Note over cpu1 : cpu1中cacheline a=0
+
+
+
+Note over cpu0 : cpu0执行a=1
+
+cpu0->>cpu1: cpu0 缓存没命中a,发送 read invalidate 到cpu1，读取a的值
+cpu0->>cpu0SB: 写入a=1到Store Bufferes
+
+cpu1->>cpu0CL: 发送a=0到cpu0
+cpu0CL->>cpu0: cpu0从cacheLine读取a=0到寄存器
+cpu0SB->>cpu0CL: 写入存在Store Bufferes的a=1
+cpu0->>cpu0: 执行b=a+1</pre><p>最后<code>b=1</code>不符合期望</p><h5 id="store-forwarding"><a href="#store-forwarding" class="headerlink" title="store forwarding"></a>store forwarding</h5><p>为了解决上面的问题，硬件工程师修改了cpu的设计<br>当CPU执行load操作的时候，不但要看cache，还有看store buffer是否有内容，如果store buffer有该数据，那么就采用store buffer中的值。因此，即便是store操作还没有写入cacheline，store forwarding的效果看起来就好象cpu的store操作被向前传递了一样（后面的load的指令可以感知到这个store操作）</p><pre class="mermaid">graph TD
+subgraph Cpu
+    cpu0
+    buff(Store Bufferes)
+    cache
+
+    cpu0 --> buff
+    buff --> cache
+    cache --还要根据Store Bufferes是否有这个值进行返回--> cpu0
+end</pre><figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line">void foo()&#123;</span><br><span class="line">    <span class="attribute">a</span>=1;</span><br><span class="line">    <span class="attribute">b</span>=1;</span><br><span class="line">&#125;</span><br><span class="line">void bar()&#123;</span><br><span class="line">    <span class="keyword">while</span>(<span class="attribute">b</span>==0) continue;</span><br><span class="line">    assert(<span class="attribute">a</span>==1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><pre class="mermaid">sequenceDiagram
+participant cpu0
+Note over cpu0: cpu0执行foo函数
+
+participant cpu0SB
+Note over cpu0SB:  cpu0的Store Bufferes
+participant cpu0CL
+Note over cpu0CL: cpu0的cacheLine b=0
+participant cpu1
+Note over cpu1 : cpu1中cacheline a=0
+Note over cpu1 : cpu1执行bar函数
+
+Note over cpu0 : cpu0执行a=1
+
+cpu0->>cpu1: cpu0 缓存没命中a,发送 read invalidate 到cpu1，读取a的值
+cpu0->>cpu0SB: 写入a=1到Store Bufferes
+
+Note over cpu1 : cpu1执行while(b==0)
+cpu1->>cpu0: cpu1 cache中没有b的值,发送 read invalidate 到cpu0，试图读取b的值
+
+Note over cpu0 : cpu0继续执行b=1
+
+cpu0->>cpu0CL: 由于cacheline中有b的值，处于E或者M状态，所以直接更新b=1到cacheline
+
+Note over cpu0 : cpu0收到cpu1要读取b的值
+cpu0CL->>cpu1: cpu0把最新的b=1给cpu1，同时修改自己的状态为S
+
+Note over cpu1 : cpu1判断b为1，跳出循环
+Note over cpu1 : cpu1执行assert(a==1),此时cpu1中a还等于0，失败
+
+Note over cpu1 : cpu1收到cpu0的read invalidate
+Note over cpu1 : 返回a的值，并且清空自己的cache，但是此时已经晚了
+
+
+cpu0SB->>cpu0CL: cpu0收到ack，把a=1写入cache，但是此时cpu1已经assert fail了</pre><figure class="highlight angelscript"><table><tr><td class="code"><pre><span class="line"><span class="built_in">void</span> foo(<span class="built_in">void</span>)</span><br><span class="line">&#123;</span><br><span class="line">    a = <span class="number">1</span>;</span><br><span class="line">    smp_mb();</span><br><span class="line">    b = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">void</span> bar(<span class="built_in">void</span>)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">while</span> (b == <span class="number">0</span>) <span class="keyword">continue</span>;</span><br><span class="line">    smp_mb();</span><br><span class="line">    assert(a == <span class="number">1</span>);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure><pre class="mermaid">sequenceDiagram
+participant cpu0
+Note over cpu0: cpu0执行foo函数
+
+participant cpu0SB
+Note over cpu0SB:  cpu0的Store Bufferes
+participant cpu0CL
+Note over cpu0CL: cpu0的cacheLine b=0
+participant cpu1
+Note over cpu1 : cpu1中cacheline a=0
+Note over cpu1 : cpu1执行bar函数
+
+Note over cpu0 : cpu0执行a=1
+
+cpu0->>cpu1: cpu0 缓存没命中a,发送 read invalidate 到cpu1，读取a的值
+cpu0->>cpu0SB: 写入a=1到Store Bufferes
+
+Note over cpu1 : cpu1执行while(b==0)
+cpu1->>cpu0: cpu1 cache中没有b的值,发送 read invalidate 到cpu0，试图读取b的值
+
+Note over cpu0 : cpu0遇到smp_mb(),标记Store Bufferes中的a=1
+
+
+Note over cpu1 : cpu1收到cpu0的 <br> invalidate 消息，放入Invalidate Queue，<br>并立刻回送Ack。
+cpu1->>cpu0: cpu1返回Invalidate ack
+cpu0SB->>cpu0CL: cpu0收到ack，把a=1写入cacheline
+Note over cpu0 : cpu0越过内存屏障，继续执行b=1
+
+cpu0->>cpu0CL: 由于cacheline中有b的值，处于E或者M状态，所以直接更新b=1到cacheline
+
+Note over cpu0 : cpu0收到cpu1要读取b的值
+cpu0CL->>cpu1: cpu0把最新的b=1给cpu1，同时修改自己的状态为S
+
+Note over cpu1 : cpu1判断b为1，跳出循环
+
+Note over cpu1 : cpu1遇到smp_mb，<br>现在不能执行， <br> 只能等待，<br>直到Invalidate Queue中的message <br> 被处理完成
+
+Note over cpu1 : CPU 1处理队列中缓存的<br>Invalidate消息，<br> 将a对应的cacheline <br> 设置为无效
+Note over cpu1 : cpu1执行assert(a==1),由于现在a无效，所以cpu1去cpu0获取a的最新值
+
+Note over cpu1 : cpu1再执行assert(a==1)就成功了</pre><hr><p>参考了很多文章，试着理解了下这个过程，若有不妥之处，请指正。</p><blockquote><p>简单的一个语句，cpu都做了这么多事，真是伟大的东西。</p></blockquote><h4 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h4><ul><li><a href="http://www.wanqing520.cn/201610/14/java/2016-10-14-java-lock.html" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">总线锁和缓存锁</a></li><li><a href="https://zhuanlan.zhihu.com/p/31875174" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">细说Cache-L1/L2/L3/TLB</a></li><li><a href="https://www.cnblogs.com/snow826520/p/8574824.html" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">CPU中的cache结构以及cache一致性</a></li><li><a href="https://zh.wikipedia.org/wiki/MESI%E5%8D%8F%E8%AE%AE" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">维基百科-MESI</a></li><li><a href="https://blog.csdn.net/fandroid/article/details/45969351" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">MESI协议－CPU缓存一致性协议</a></li><li><a href="https://blog.csdn.net/reliveIT/article/details/50450136" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">【并发编程】CPU cache结构和缓存一致性（MESI协议）</a></li><li><a href="https://www.cnblogs.com/yanlong300/p/8986041.html" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">CPU缓存一致性协议MESI</a> <em>这篇文章很不错</em></li><li><a href="https://zhuanlan.zhihu.com/p/66085562" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">内存屏障Memory Barrier: a Hardware View</a></li><li><a href="http://www.wowotech.net/kernel_synchronization/Why-Memory-Barriers.html" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">Why Memory Barriers？中文翻译（上）</a></li><li><a href="https://wudaijun.com/2019/04/cpu-cache-and-memory-model/" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">Cache一致性和内存模型</a></li></ul><script type="text&#x2F;javascript" src="https://unpkg.com/kity@2.0.4/dist/kity.min.js"></script><script type="text&#x2F;javascript" src="https://unpkg.com/kityminder-core@1.4.50/dist/kityminder.core.min.js"></script><script defer="true" type="text&#x2F;javascript" src="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.js"></script><link rel="stylesheet" type="text&#x2F;css" href="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.css">]]></content>
+      <categories>
+        <category>分布式</category>
+      </categories>
+      <tags>
+        <tag>atomic</tag>
+        <tag>原子</tag>
+        <tag>多核</tag>
+        <tag>锁</tag>
+        <tag>MESI</tag>
+        <tag>缓存一致性</tag>
+        <tag>内存屏障</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>redis-服务端部分实现原理</title>
+    <url>/redis-server/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><blockquote><p>本文根据《redis设计与实现》，浅谈redis的单机实现原理。</p></blockquote><h3 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h3><h4 id="键空间"><a href="#键空间" class="headerlink" title="键空间"></a>键空间</h4><ul><li>数据结构字典</li><li>键都是<code>string</code>对象</li></ul><h4 id="过期删除策略"><a href="#过期删除策略" class="headerlink" title="过期删除策略"></a>过期删除策略</h4><p>redis采用的是惰性删除和定期删除</p><h5 id="惰性删除"><a href="#惰性删除" class="headerlink" title="惰性删除"></a>惰性删除</h5><p>只有对key进行读写访问时，才会进行过期判断，过期进行删除。很明显这样缺点是会内存中存在大量的过期key，无法释放空间。</p><h5 id="定期删除"><a href="#定期删除" class="headerlink" title="定期删除"></a>定期删除</h5><p>通过限制一定的频率和操作的时长，来控制删除操作，保证删除操作不会长时间占用cpu</p><h5 id="定期删除实现"><a href="#定期删除实现" class="headerlink" title="定期删除实现"></a>定期删除实现</h5><ol><li>周期性函数中</li><li>每次读取一定数量的key</li><li>记录进度，便于后面进行处理</li></ol><h4 id="aof，rdb和赋值对过期key的处理"><a href="#aof，rdb和赋值对过期key的处理" class="headerlink" title="aof，rdb和赋值对过期key的处理"></a>aof，rdb和赋值对过期key的处理</h4><ul><li>rdb对过期key处理</li></ul><ol><li>生成rdb文件，过期key会跳过</li><li>主服务模式运行，rdb载入会跳过过期key</li><li>从服务模式运行，rdb载入会全部载入，主从同步时会进行清理</li></ol><ul><li>aof对过期key处理</li></ul><ol><li>key被惰性删除和定期删除<strong>时</strong>，会追歼del语句到aof，具体操作，惰性删除：删除-追加del-返回客户端空</li></ol><ul><li>复制模式下</li></ul><ol><li>主服务删除key，会发送del给从服务，从服务收到del才删除</li><li>从服务被客户端访问到过期key，不会删除key，直接返回空</li></ol><h3 id="RDB持久化"><a href="#RDB持久化" class="headerlink" title="RDB持久化"></a>RDB持久化</h3><p>redis是内存数据库，所有数据都在内存中，重启会丢失，所以redis提供了持久化的功能。保证数据能落到磁盘进行保存，下次启动能恢复。</p><ul><li>rdb持久化，实现原理就是，对数据库进行快照，保存为一定格式的二进制文件。</li></ul><h4 id="save-amp-bgsave"><a href="#save-amp-bgsave" class="headerlink" title="save&amp;bgsave"></a>save&amp;bgsave</h4><ul><li>save命令会阻塞进程，直到rdb文件写入完成</li><li>bgsave创建子进程保存rdb</li><li>aof开启，不会使用rdb载入数据</li><li>只有aof关闭时，才会使用rdb来还原</li><li>save期间，所有客户端命令被阻塞</li><li>bgsave期间<ul><li>bgsave命令被拒绝</li><li>save命令被拒绝</li></ul></li><li>bgsave和bgrewriteaof互斥</li><li>save 900 1 900s内对数据库进行1次修改</li><li>通过dirty值和lastsave时间戳判断是否满足save条件</li></ul><h3 id="AOF持久化"><a href="#AOF持久化" class="headerlink" title="AOF持久化"></a>AOF持久化</h3><ul><li>记录redis的操作记录</li><li>文本文件</li></ul><h4 id="aof实现"><a href="#aof实现" class="headerlink" title="aof实现"></a>aof实现</h4><ul><li>命令追加<code>aof_buf</code>缓冲区</li><li>redis的时间事件，会考虑是否把缓冲区内容写入aof文件</li><li><code>appendfsync</code>配置使用何种方式持久化<ul><li>always 写入aof文件并且同步到磁盘完成（保证完全落到磁盘）</li><li>everysec 如果上次同步aof距离现在超过1s，那么再次同步，并且由一个线程专门执行</li><li>no 只负责写入aof文件，同步到磁盘依赖操作系统完成</li></ul></li></ul><h4 id="文件的写入和同步"><a href="#文件的写入和同步" class="headerlink" title="文件的写入和同步"></a>文件的写入和同步</h4><h5 id="write函数"><a href="#write函数" class="headerlink" title="write函数"></a>write函数</h5><pre class="mermaid">graph LR
+subgraph write
+    用户buf
+    内核buf
+    磁盘
+end
+用户buf --> 内核buf --> 磁盘</pre><p>write函数是在写入到内核缓冲区就返回了，实际要落到磁盘，是操作系统决定的，当然我们也可以调用<code>fsync</code>和 <code>fdatasync</code>来强制同步数据到磁盘</p><h5 id="aof安全性"><a href="#aof安全性" class="headerlink" title="aof安全性"></a>aof安全性</h5><p>appendfsync</p><ul><li>aways 每次事件循环都追加，并且保证数据完全同步到磁盘，安全性很高，最多丢失一个事件循环的命令，效率不高</li><li>everysec 每一秒进行同步，最大丢失1s的命令</li><li>no 最快，但是，由于依赖操作系统的同步机制，何时真正落到磁盘，取决于缓冲区是否满，最大丢失从上一次同步到这次的命令，丢失数据量相对更多</li></ul><h5 id="伪客户端"><a href="#伪客户端" class="headerlink" title="伪客户端"></a>伪客户端</h5><ul><li>不带网络连接的客户端</li><li>还原aof使用</li></ul><h4 id="aof重写"><a href="#aof重写" class="headerlink" title="aof重写"></a>aof重写</h4><ul><li>重写原理是<code>fork</code>子进程，把内存中的数据库，转换成redis的命令，写入到新的aof文件，再进行原子替换aof文件</li></ul><h4 id="aof重写几个问题"><a href="#aof重写几个问题" class="headerlink" title="aof重写几个问题"></a>aof重写几个问题</h4><h5 id="线程进程方式对比？"><a href="#线程进程方式对比？" class="headerlink" title="线程进程方式对比？"></a>线程进程方式对比？</h5><ul><li>用进程，可以直接给内存拍快照，而用线程，就无法避免需要使用锁来保证安全性，进程的方式其实是用内存来换取了性能，当然，操作系统的<code>copy-on-write</code>机制使得内存的浪费也不会特别严重。<h5 id="重写期间，如果有新请求怎么办？"><a href="#重写期间，如果有新请求怎么办？" class="headerlink" title="重写期间，如果有新请求怎么办？"></a>重写期间，如果有新请求怎么办？</h5></li><li>首先，子进程重写不会影响父进程，父进程会继续提供服务，此时新请求过来，会把新命令追加到<code>aof缓冲区</code>和<code>aof重写缓冲区</code>,现有的aof持久化依旧会进行，子进程写入的文件是新的aof文件，不会冲突。</li><li>当子进程写入完成后，会发送一个信号给父进程</li><li>父进程把aof重写缓冲区的内容追加到新的aof文件，替换文件名字</li></ul><h5 id="性能影响在哪？"><a href="#性能影响在哪？" class="headerlink" title="性能影响在哪？"></a>性能影响在哪？</h5><ul><li>父进程收到信号，处理的阶段，是阻塞的，已经把性能损耗降低到了极致</li></ul><pre class="mermaid">sequenceDiagram
+participant 父进程
+participant 子进程
+Note over 父进程: set k1 v1
+Note over 父进程: set k2 v2
+Note over 父进程: set k3 v3
+
+父进程 ->> 子进程: 开始aof重写
+Note over 子进程: 把内存快照转换成 <br>redis命令，<br>写入新的aof文件
+
+Note over 父进程: set k4 v4 <br> 追加到aof重写缓冲区
+Note over 父进程: set k5 v5 <br> 追加到aof重写缓冲区
+子进程 ->> 父进程: 发送信号
+Note over 父进程: 将aof重写缓冲区<br>追加到新的aof文件
+Note over 父进程: 替换aof文件</pre><h3 id="事件"><a href="#事件" class="headerlink" title="事件"></a>事件</h3><p>redis主要有两种时事件。文件事件，时间事件。</p><h4 id="文件事件"><a href="#文件事件" class="headerlink" title="文件事件"></a>文件事件</h4><p>通过封装<code>epoll</code> <code>select</code> <code>evport</code> <code>kqueue</code>，实现反应堆模型。io复用和单线程模式，让redis用最简单的方式达到了最高的性能。</p><h5 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h5><ul><li>redis是通过一段宏在编译时选不同的实现方式，优先级<code>evport&gt;epoll&gt;kqueue&gt;select</code></li><li>AE_READABLE 可读事件，读客户端数据，close，accept新连接</li><li>AE_WRITABLE 给客户端回包</li><li>优先级 AE_READABLE&gt;AE_WRITABLE</li></ul><h5 id="事件处理器"><a href="#事件处理器" class="headerlink" title="事件处理器"></a>事件处理器</h5><ul><li>连接应答处理器<br>主要负责处理新连接</li><li>命令请求处理器<br>负责读取客户端命令</li><li>命令回复处理器<br>回包</li></ul><pre class="mermaid">sequenceDiagram
+participant 客户端
+participant 连接处理器
+participant 命令请求处理器
+participant 命令回复处理器
+
+Note over 连接处理器: 服务启动时会<br>为连接套接字绑定<br>连接处理器
+客户端->>连接处理器: 建立连接，触发连接处理器
+连接处理器->>命令请求处理器: 连接处理器创建命令请求处理器
+命令请求处理器->>命令回复处理器: 处理命令请求处理器，创建命令回复处理器
+命令回复处理器->>客户端: 处理命令回复处理器，给客户端回包</pre><h4 id="时间事件"><a href="#时间事件" class="headerlink" title="时间事件"></a>时间事件</h4><ul><li>redis包含定时时间事件和周期时间事件，通过时间处理器返回的AE_NOMORE来决定</li><li>redis的时间事件和文件事件是一起调度的<h5 id="实现-1"><a href="#实现-1" class="headerlink" title="实现"></a>实现</h5></li><li>每次执行事件循环<code>aeProcessEvents</code>，都先获取最近的时间事件到达的时间，用这个时间来决定，每次epoll或者其他(select)阻塞的时间，如果期间没有文件事件，那么epoll阻塞完，就刚好需要执行时间事件</li><li>如果最后一次文件时间处理事件过长，会导致时间事件被延后执行，因为此处redis是单进程单线程的</li><li>时间事件中类似持久化的操作会放到子线程或者子进程，防止时间事件长时间阻塞</li><li>文件时间也尽量不长时间阻塞服务器，当write时，如果超过某个阈值，会直接break，下次再写</li></ul><script type="text&#x2F;javascript" src="https://unpkg.com/kity@2.0.4/dist/kity.min.js"></script><script type="text&#x2F;javascript" src="https://unpkg.com/kityminder-core@1.4.50/dist/kityminder.core.min.js"></script><script defer="true" type="text&#x2F;javascript" src="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.js"></script><link rel="stylesheet" type="text&#x2F;css" href="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.css">]]></content>
+      <categories>
+        <category>redis</category>
+      </categories>
+      <tags>
+        <tag>redis单机数据库</tag>
+        <tag>redis</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>redis设计与实现--数据结构与对象</title>
+    <url>/redis/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><blockquote><p>本文根据《redis设计与实现》，浅谈redis的数据结构实现原理。</p></blockquote><h3 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h3><p>redis在业界受到越来越多的青睐，以其优秀的性能广受欢迎，抽空看了下《redis的设计与实现》，记录下读书笔记，根据书中的篇幅，一共分为下面几个部分，数据结构与对象，单机数据库的实现，多机数据库的实现。本文是数据结构与对象篇。</p><blockquote><p>目前最新的redis的代码可能和书中有所出入。</p></blockquote><h3 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h3><h4 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h4><ul><li>redis设计与实现的sds版本<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sdshdr</span> &#123;</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> len;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> <span class="built_in">free</span>;</span><br><span class="line">    <span class="keyword">char</span> buf[];</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li></ul><pre class="mermaid">graph LR
+subgraph SDS
+    len(len int 长度)
+    free(free int 未使用的字节数)
+    buf(buf char 字符串)
+end
+    buf --> str('a''b''\0')</pre><h4 id="自动扩容-amp-空间预分配"><a href="#自动扩容-amp-空间预分配" class="headerlink" title="自动扩容&amp;空间预分配"></a>自动扩容&amp;空间预分配</h4><ul><li>例子，当要保存一个10字节的字符串</li></ul><pre class="mermaid">graph LR
+subgraph SDS
+    len(len int 长度)
+    free(free int 未使用的字节数)
+    buf(buf char 字符串)
+end
+    len --> len10(10)
+    free --> free10(10)
+    buf --> str('0''1'...'9''\0')</pre><p>当修改需要扩容的时候，如果小于<code>1MB</code>，会预分配同等大小的<code>free</code>空间，最后分配的是<code>2X+1</code>，其中多1字节用于保存结尾的<code>&#39;\0&#39;</code></p><h4 id="惰性删除"><a href="#惰性删除" class="headerlink" title="惰性删除"></a>惰性删除</h4><p>删除操作不会真的释放空间，而是改变<code>free</code>和<code>len</code>的大小。下次需要使用的时候，空间足够不用再次分配内存。</p><h4 id="杜绝缓冲区溢出"><a href="#杜绝缓冲区溢出" class="headerlink" title="杜绝缓冲区溢出"></a>杜绝缓冲区溢出</h4><p>c语言的字符串，需要调用方来保证分配足够的内存空间，防止出现溢出，但这其实是很危险的，由于sds保存了字符串的长度信息，可以高效的进行检查，扩容，保证不出现溢出。</p><h4 id="二进制安全"><a href="#二进制安全" class="headerlink" title="二进制安全"></a>二进制安全</h4><p>对于c语言的字符串，<code>&#39;\0&#39;</code>是末未结束符，意味着，字符串内不能出现结束符，否则字符串将被截断，所以针对二进制数据，c语言的字符串无法保存。sds则不同。由于sds不再使用<code>&#39;\0&#39;</code>来判断字符串结束，并且所有api都是二进制安全的，因此可以直接保存二进制数据。</p><h4 id="部分兼容c字符串"><a href="#部分兼容c字符串" class="headerlink" title="部分兼容c字符串"></a>部分兼容c字符串</h4><p>由于sds的末尾还是以<code>&#39;\0&#39;</code>结束，因此，当保存文本的数据的时候，sds可以兼容c语言的字符串操作函数。</p><h3 id="链表"><a href="#链表" class="headerlink" title="链表"></a>链表</h3><h4 id="结构-1"><a href="#结构-1" class="headerlink" title="结构"></a>结构</h4><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">listNode</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">listNode</span> *<span class="title">prev</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">listNode</span> *<span class="title">next</span>;</span></span><br><span class="line">    <span class="keyword">void</span> *value;</span><br><span class="line">&#125; listNode;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">listIter</span> &#123;</span></span><br><span class="line">    listNode *next;</span><br><span class="line">    <span class="keyword">int</span> direction;</span><br><span class="line">&#125; listIter;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">list</span> &#123;</span></span><br><span class="line">    listNode *head;</span><br><span class="line">    listNode *tail;</span><br><span class="line">    <span class="keyword">void</span> *(*dup)(<span class="keyword">void</span> *ptr);</span><br><span class="line">    <span class="keyword">void</span> (*<span class="built_in">free</span>)(<span class="keyword">void</span> *ptr);</span><br><span class="line">    <span class="keyword">int</span> (*match)(<span class="keyword">void</span> *ptr, <span class="keyword">void</span> *key);</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> len;</span><br><span class="line">&#125; <span class="built_in">list</span>;</span><br></pre></td></tr></table></figure><pre class="mermaid">graph LR
+subgraph List
+    head(head listNode* 头)
+    tail(tail listNode* 尾)
+    len(len unsigned long 节点个数)
+    dup(dup 复制节点的接口)
+    free(free 释放节点的接口)
+    match(match 判断节点相等的接口)
+
+end
+
+
+head --> node1
+node1 --prev--> NULL1(NULL)
+node1 --next--> node2
+node2 --prev--> node1
+node2 --next--> node3
+node3 --prev--> node2
+node3 --next--> NULL
+
+tail --> node3
+len --> 3</pre><h4 id="双向链表"><a href="#双向链表" class="headerlink" title="双向链表"></a>双向链表</h4><p>redis的链表实现是双向链表，头结点前置和尾节点的后置都是<code>NULL</code></p><h4 id="接口实现"><a href="#接口实现" class="headerlink" title="接口实现"></a>接口实现</h4><p>为了让链表更加通用，提供了三个接口函数以便使用者实现，分别是复制，释放，比较相等的操作，外部使用者可以根据存储的不同的对象，进行不同的实现，一种多态的编程方式。</p><h3 id="字典"><a href="#字典" class="headerlink" title="字典"></a>字典</h3><figure class="highlight arduino"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dictEntry</span> &#123;</span></span><br><span class="line">    <span class="keyword">void</span> *key;</span><br><span class="line">    <span class="keyword">union</span> &#123;</span><br><span class="line">        <span class="keyword">void</span> *val;</span><br><span class="line">        <span class="keyword">uint64_t</span> u64;</span><br><span class="line">        <span class="keyword">int64_t</span> s64;</span><br><span class="line">        <span class="keyword">double</span> d;</span><br><span class="line">    &#125; v;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">dictEntry</span> *<span class="title">next</span>;</span></span><br><span class="line">&#125; dictEntry;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dictht</span> &#123;</span></span><br><span class="line">    dictEntry **table;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="built_in">size</span>;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> sizemask;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> used;</span><br><span class="line">&#125; dictht;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dict</span> &#123;</span></span><br><span class="line">    dictType *type;</span><br><span class="line">    <span class="keyword">void</span> *privdata;</span><br><span class="line">    dictht ht[<span class="number">2</span>];</span><br><span class="line">    <span class="keyword">long</span> rehashidx; <span class="comment">/* rehashing not in progress if rehashidx == -1 */</span></span><br><span class="line">    <span class="keyword">int</span> iterators; <span class="comment">/* number of iterators currently running */</span></span><br><span class="line">&#125; dict;</span><br></pre></td></tr></table></figure><h4 id="hash表"><a href="#hash表" class="headerlink" title="hash表"></a>hash表</h4><ul><li>这是一个没有<code>rehash</code>的字典</li></ul><pre class="mermaid">graph LR
+
+subgraph 字典
+    type
+    privdate
+    ht
+    rehashindex
+end
+
+
+subgraph hash表
+    table(table-hash表数组)
+    size(size-hash表大小)
+    sizemask
+    used(used-已有节点数)
+end
+
+subgraph DictEntry*数组-桶
+    0
+    1
+    2
+    3
+end
+
+subgraph 键值对
+    k1
+    v1
+end
+
+subgraph DictEntry1
+    k2
+    v2
+end
+
+
+subgraph hash表1
+    table1
+    size1
+    sizemask1
+    used1
+end
+
+
+ht --> ht0
+ht --> ht1
+ht0 --> table
+ht1 --> table1
+
+table --> 0
+2 --> NULL(NULL)
+1 --> NULL1(NULL)
+3 --> NULL2(NULL)
+0 --> k1
+k1 --next--> k2
+k2 --next--> NULL3(NULL) 
+size --> 4
+sizemask --> 3num(3)
+used --> 2num(2)
+
+table1 --> NULL4(NULL)
+size1 --> 0num(0)
+sizemask1 --> 0num1(0) 
+used1 --> 1num2(0)
+rehashindex --> -1</pre><h4 id="接口"><a href="#接口" class="headerlink" title="接口"></a>接口</h4><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dictType</span> &#123;</span></span><br><span class="line">    <span class="comment">//计算hash值的函数接口</span></span><br><span class="line">    <span class="function"><span class="keyword">unsigned</span> <span class="title">int</span> <span class="params">(*hashFunction)</span><span class="params">(<span class="keyword">const</span> <span class="keyword">void</span> *key)</span></span>;</span><br><span class="line">    <span class="comment">//复制键的函数接口</span></span><br><span class="line">    <span class="keyword">void</span> *(*keyDup)(<span class="keyword">void</span> *privdata, <span class="keyword">const</span> <span class="keyword">void</span> *key);</span><br><span class="line">    <span class="comment">//复制值的接口</span></span><br><span class="line">    <span class="keyword">void</span> *(*valDup)(<span class="keyword">void</span> *privdata, <span class="keyword">const</span> <span class="keyword">void</span> *obj);</span><br><span class="line">    <span class="comment">//对比键的接口</span></span><br><span class="line">    <span class="keyword">int</span> (*keyCompare)(<span class="keyword">void</span> *privdata, <span class="keyword">const</span> <span class="keyword">void</span> *key1, <span class="keyword">const</span> <span class="keyword">void</span> *key2);</span><br><span class="line">    <span class="comment">//销毁键的接口</span></span><br><span class="line">    <span class="keyword">void</span> (*keyDestructor)(<span class="keyword">void</span> *privdata, <span class="keyword">void</span> *key);</span><br><span class="line">    <span class="comment">//销毁值的接口</span></span><br><span class="line">    <span class="keyword">void</span> (*valDestructor)(<span class="keyword">void</span> *privdata, <span class="keyword">void</span> *obj);</span><br><span class="line">&#125; dictType;</span><br></pre></td></tr></table></figure><h4 id="hash算法"><a href="#hash算法" class="headerlink" title="hash算法"></a>hash算法</h4><p>提到hash表，不可避免的要提到hash算法，redis的字典的hash算法是通过上面的定义的接口，让使用者传入具体的实现，也是一种多态的方式，比如计算hash值的时候，会根据上面的<code>hashFunction</code>的具体实现，调用不同的计算方式。</p><h5 id="MurmurHash"><a href="#MurmurHash" class="headerlink" title="MurmurHash"></a>MurmurHash</h5><p>默认采用的murmurhash2算法</p><h4 id="解决冲突"><a href="#解决冲突" class="headerlink" title="解决冲突"></a>解决冲突</h4><p>从上面的图可以看出，redis采用的是拉链式解决冲突，在键值对后面通过next指针进行索引。</p><h4 id="rehash"><a href="#rehash" class="headerlink" title="rehash"></a>rehash</h4><p>当hash表负载过大或者过低时，会触发rehash的动作。试图增大或者缩小hash表的大小。</p><h5 id="负载因子"><a href="#负载因子" class="headerlink" title="负载因子"></a>负载因子</h5><p><code>load_factor=used/size</code></p><ul><li>负载因子越大，说明使用的越多，需要扩容。</li><li>负载因子越小，说明空闲的越多，需要缩容。</li></ul><h5 id="扩缩容"><a href="#扩缩容" class="headerlink" title="扩缩容"></a>扩缩容</h5><div id="flowchart-0" class="flow-chart"></div>- 若负载因子小于0.1，则进行缩容<h4 id="渐进式rehash"><a href="#渐进式rehash" class="headerlink" title="渐进式rehash"></a>渐进式rehash</h4><p><code>rehash</code>不是一次性完成的，因为，redis中的hash表可能非常大，如果一次性<code>rehash</code>，会严重阻塞服务器，所以redis的做法是分批次进行，也叫渐进式rehash。这就是为什么<code>ht</code>会有两个大小的原因。</p><ul><li>rehashindex=0表示rehash开始，每次加1</li><li>不是集中式的rehash，而是分布在每次查找，删除，更新操作中</li><li>读取会同时读取ht[0]和ht[1]</li><li>写入，不会再写入ht[0]</li></ul><h3 id="跳跃表"><a href="#跳跃表" class="headerlink" title="跳跃表"></a>跳跃表</h3><pre class="mermaid">graph LR
+subgraph 跳表
+    header(header)
+    tail(tail)
+    level(level)
+    length1(length)
+end
+
+subgraph Node
+    L132(L32)
+    L_(...)
+    L5(L5)
+    L4(L4)
+    L3(L3)
+    L2(L2)
+    L1(L1)
+end
+
+subgraph Node1
+    L14(L4)
+    L13(L3)
+    L12(L2)
+    L11(L1)
+    Score1(Score=1)
+    Obj1(obj)
+end
+
+subgraph Node2
+
+    L22(L2)
+    L21(L1)
+    Score2(Scor=2)
+    Obj2(obj)
+end
+
+subgraph Node3
+    L35(L5)
+    L34(L4)
+    L33(L3)
+    L32(L2)
+    L31(L1)
+    Score3(Scor=3)
+    Obj3(obj)
+end
+
+L5 --3--> L35
+L4 --1--> L14
+L14 --2--> L34
+L3 --1--> L13
+L13 --2--> L33
+L2 --1--> L12
+L12 --1--> L22
+L22 --1--> L32
+L1 --1--> L11
+L11 --1--> L21
+L21 --1--> L31
+
+L31 --0--> NULL1(NULL)
+L32 --0--> NULL2(NULL)
+L33 --0--> NULL3(NULL)
+L34 --0--> NULL4(NULL)
+L35 --0--> NULL5(NULL)
+L132 --> NULL6(NULL)
+
+header --> L1
+tail --> Obj3
+level --> 5
+length1 --> 3</pre><ul><li>上面是跳表的结构，其实如果把跳表退化到只有一层，跨度全部是1，就可以看成是链表，同样，跳表可以看成是对一个节点有多层的描述的数据结构，每一层是链表。</li><li>跳表是在分数的维度组织的，obj是关联的对象。分数相同，但是obj不同，属于不同的节点。</li><li>遍历的时候，只需要找level中跨度最小的的层，依次往后走就能遍历整个跳表。</li><li>跨度值可以帮助快速定位范围的节点。</li></ul><h4 id="整数集合"><a href="#整数集合" class="headerlink" title="整数集合"></a>整数集合</h4><pre class="mermaid">graph LR
+subgraph 整数集合
+    encoding(encdoding)
+    length1(length)
+    contents(contents)
+end
+
+subgraph contents
+    1
+    2
+    3
+end
+
+contents --> 1</pre><ul><li>有序</li><li>整数集合可以根据元素范围，选择合适的编码格式，针对小元素集合，可以选择更少的bit来保存，节约内存</li><li>自动进行编码升级，当集合无法表示一个大的数字，就会触发升级，使用更多的bit来保存，所以添加的复杂度是O(N)</li><li>不支持降级<script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/flowchart/1.6.5/flowchart.min.js"></script><textarea id="flowchart-0-code" style="display:none">st=>start: Start
+
+c2=>condition: 在执行BGSAVE或
+BGREWRITEAOF？
+c3=>condition: 负载因子大于1？
+c4=>condition: 负载因子大于5？
+op2=>operation: 执行rehash
+e=>end: end
+
+st->c2
+c2(yes,right)->c4
+c2(no)->c3
+c3(yes)->op2
+c3(no)->e
+c4(yes)->op2
+c4(no)->e
+op2->e</textarea><textarea id="flowchart-0-options" style="display:none">{"theme":"simple","scale":1,"line-width":2,"line-length":50,"text-margin":10,"font-size":12}</textarea><script>var code=document.getElementById("flowchart-0-code").value,options=JSON.parse(decodeURIComponent(document.getElementById("flowchart-0-options").value)),diagram=flowchart.parse(code);diagram.drawSVG("flowchart-0",options)</script></li></ul><script type="text&#x2F;javascript" src="https://unpkg.com/kity@2.0.4/dist/kity.min.js"></script><script type="text&#x2F;javascript" src="https://unpkg.com/kityminder-core@1.4.50/dist/kityminder.core.min.js"></script><script defer="true" type="text&#x2F;javascript" src="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.js"></script><link rel="stylesheet" type="text&#x2F;css" href="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.css">]]></content>
+      <categories>
+        <category>redis</category>
+        <category>数据结构</category>
+      </categories>
+      <tags>
+        <tag>redis</tag>
+        <tag>redis设计与实现</tag>
+        <tag>redis数据结构</tag>
+        <tag>跳表</tag>
+        <tag>sds</tag>
+        <tag>链表</tag>
+        <tag>hash table</tag>
+        <tag>字典</tag>
+      </tags>
+  </entry>
+</search>
