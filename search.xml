@@ -73,7 +73,7 @@ defaultIndex --> i1_node1</pre><script type="text&#x2F;javascript" src="https://
     <url>/coroutine/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><blockquote><p>协程到底是什么？跟</p></blockquote><h1 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h1><script type="text&#x2F;javascript" src="https://unpkg.com/kity@2.0.4/dist/kity.min.js"></script><script type="text&#x2F;javascript" src="https://unpkg.com/kityminder-core@1.4.50/dist/kityminder.core.min.js"></script><script defer="true" type="text&#x2F;javascript" src="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.js"></script><link rel="stylesheet" type="text&#x2F;css" href="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.css">]]></content>
       <categories>
-        <category>协程</category>
+        <category>linux系统</category>
       </categories>
       <tags>
         <tag>进程</tag>
@@ -164,8 +164,7 @@ epoll_wait返回 --> 回调handle
 c --yes--> fd绑定handle
 c --no--> 释放fd</pre><ul><li>epoll_wait可以支持设置毫秒级别的阻塞时间，因此通常epoll也用在实现精确的定时任务。</li></ul><h2 id="redis中的epoll"><a href="#redis中的epoll" class="headerlink" title="redis中的epoll"></a>redis中的epoll</h2><h3 id="redis统一的ae接口定义"><a href="#redis统一的ae接口定义" class="headerlink" title="redis统一的ae接口定义"></a>redis统一的ae接口定义</h3><ul><li>redis中把select，epoll，kqueue等系统提供的接口抽象成了统一的接口，在ae.h中可以找到定义。</li><li>redis的实现思路也是和上面的流程一致，基于事件反应堆实现的，并且redis的源码可读性特别高，读起来特别舒服，十分推荐</li></ul><h3 id="redis中的场景"><a href="#redis中的场景" class="headerlink" title="redis中的场景"></a>redis中的场景</h3><ul><li>读写用户请求（好像有点废话了）</li><li>定时任务</li></ul><h3 id="redis的epoll部分实现逻辑"><a href="#redis的epoll部分实现逻辑" class="headerlink" title="redis的epoll部分实现逻辑"></a>redis的epoll部分实现逻辑</h3><ul><li><p>redis一开始都是单线程的，根据上面的流程图，可以想象假如在处理单个用户的fd的handle函数的时候，阻塞太长时间，比如可能回一个很大的包，这就有可能阻塞住，由于是单线程的，阻塞的就是整个进程，导致其他客户端也阻塞了，所以redis在write的时候，会检查阻塞的时间，如果超过某个阈值则会直接break掉训循环，下次再写</p></li><li><p>redis的设计，cpu往往不是瓶颈，主要可能在内存和网络io上遇到瓶颈，针对网络io，事件堆模型已经能处理大多数的场景，但是redis在6.0后还是进行了优化，采用了多线程的模式进行网络io，这样可以充分利用多核处理器。</p></li></ul><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ul><li>epoll是网络编程中的利器，广泛应用在各种开源软件，各种rpc框架中，熟悉原理很有必要，redis中的实现十分不错，非常值得用来学习epoll的原理。</li></ul><script type="text&#x2F;javascript" src="https://unpkg.com/kity@2.0.4/dist/kity.min.js"></script><script type="text&#x2F;javascript" src="https://unpkg.com/kityminder-core@1.4.50/dist/kityminder.core.min.js"></script><script defer="true" type="text&#x2F;javascript" src="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.js"></script><link rel="stylesheet" type="text&#x2F;css" href="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.css">]]></content>
       <categories>
-        <category>epoll</category>
-        <category>linux</category>
+        <category>linux系统</category>
       </categories>
       <tags>
         <tag>epoll</tag>
@@ -456,7 +455,7 @@ Note over cpu1 : cpu1执行assert(a==1),由于现在a无效，所以cpu1去cpu0�
 
 Note over cpu1 : cpu1再执行assert(a==1)就成功了</pre><hr><p>参考了很多文章，试着理解了下这个过程，若有不妥之处，请指正。</p><blockquote><p>简单的一个语句，cpu都做了这么多事，真是伟大的东西。</p></blockquote><h4 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h4><ul><li><a href="http://www.wanqing520.cn/201610/14/java/2016-10-14-java-lock.html" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">总线锁和缓存锁</a></li><li><a href="https://zhuanlan.zhihu.com/p/31875174" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">细说Cache-L1/L2/L3/TLB</a></li><li><a href="https://www.cnblogs.com/snow826520/p/8574824.html" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">CPU中的cache结构以及cache一致性</a></li><li><a href="https://zh.wikipedia.org/wiki/MESI%E5%8D%8F%E8%AE%AE" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">维基百科-MESI</a></li><li><a href="https://blog.csdn.net/fandroid/article/details/45969351" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">MESI协议－CPU缓存一致性协议</a></li><li><a href="https://blog.csdn.net/reliveIT/article/details/50450136" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">【并发编程】CPU cache结构和缓存一致性（MESI协议）</a></li><li><a href="https://www.cnblogs.com/yanlong300/p/8986041.html" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">CPU缓存一致性协议MESI</a> <em>这篇文章很不错</em></li><li><a href="https://zhuanlan.zhihu.com/p/66085562" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">内存屏障Memory Barrier: a Hardware View</a></li><li><a href="http://www.wowotech.net/kernel_synchronization/Why-Memory-Barriers.html" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">Why Memory Barriers？中文翻译（上）</a></li><li><a href="https://wudaijun.com/2019/04/cpu-cache-and-memory-model/" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">Cache一致性和内存模型</a></li></ul><script type="text&#x2F;javascript" src="https://unpkg.com/kity@2.0.4/dist/kity.min.js"></script><script type="text&#x2F;javascript" src="https://unpkg.com/kityminder-core@1.4.50/dist/kityminder.core.min.js"></script><script defer="true" type="text&#x2F;javascript" src="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.js"></script><link rel="stylesheet" type="text&#x2F;css" href="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.css">]]></content>
       <categories>
-        <category>分布式</category>
+        <category>linux系统</category>
       </categories>
       <tags>
         <tag>atomic</tag>
@@ -710,7 +709,6 @@ c4(no)->e
 op2->e</textarea><textarea id="flowchart-0-options" style="display:none">{"theme":"simple","scale":1,"line-width":2,"line-length":50,"text-margin":10,"font-size":12}</textarea><script>var code=document.getElementById("flowchart-0-code").value,options=JSON.parse(decodeURIComponent(document.getElementById("flowchart-0-options").value)),diagram=flowchart.parse(code);diagram.drawSVG("flowchart-0",options)</script></li></ul><script type="text&#x2F;javascript" src="https://unpkg.com/kity@2.0.4/dist/kity.min.js"></script><script type="text&#x2F;javascript" src="https://unpkg.com/kityminder-core@1.4.50/dist/kityminder.core.min.js"></script><script defer="true" type="text&#x2F;javascript" src="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.js"></script><link rel="stylesheet" type="text&#x2F;css" href="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.css">]]></content>
       <categories>
         <category>redis</category>
-        <category>数据结构</category>
       </categories>
       <tags>
         <tag>redis</tag>
