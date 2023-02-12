@@ -1,7 +1,4 @@
-https://www.codeloverme.cn/mlzs/
-https://www.codeloverme.cn/coroutine/
 https://www.codeloverme.cn/epoll/
-https://www.codeloverme.cn/books/
 https://www.codeloverme.cn/atomic/
 https://www.codeloverme.cn/redis-server/
 https://www.codeloverme.cn/redis/

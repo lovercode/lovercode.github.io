@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://www.codeloverme.cn/"/>
-  <updated>2023-02-10T04:55:48.160Z</updated>
+  <updated>2023-02-11T16:24:48.510Z</updated>
   <id>https://www.codeloverme.cn/</id>
   
   <author>
@@ -15,54 +15,6 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
-  
-  <entry>
-    <title>mlzs</title>
-    <link href="https://www.codeloverme.cn/mlzs/"/>
-    <id>https://www.codeloverme.cn/mlzs/</id>
-    <published>2022-03-19T05:45:57.000Z</published>
-    <updated>2023-02-10T04:55:48.160Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot; cla
-      
-    
-    </summary>
-    
-    
-    
-  </entry>
-  
-  <entry>
-    <title>协程到底是什么</title>
-    <link href="https://www.codeloverme.cn/coroutine/"/>
-    <id>https://www.codeloverme.cn/coroutine/</id>
-    <published>2022-02-25T12:35:23.000Z</published>
-    <updated>2023-02-11T16:25:14.004Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot; cla
-      
-    
-    </summary>
-    
-    
-      <category term="linux系统" scheme="https://www.codeloverme.cn/categories/linux%E7%B3%BB%E7%BB%9F/"/>
-    
-    
-      <category term="进程" scheme="https://www.codeloverme.cn/tags/%E8%BF%9B%E7%A8%8B/"/>
-    
-      <category term="线程" scheme="https://www.codeloverme.cn/tags/%E7%BA%BF%E7%A8%8B/"/>
-    
-      <category term="协程" scheme="https://www.codeloverme.cn/tags/%E5%8D%8F%E7%A8%8B/"/>
-    
-  </entry>
   
   <entry>
     <title>epoll的原理和应用</title>
@@ -89,34 +41,6 @@
       <category term="事件反应堆" scheme="https://www.codeloverme.cn/tags/%E4%BA%8B%E4%BB%B6%E5%8F%8D%E5%BA%94%E5%A0%86/"/>
     
       <category term="io" scheme="https://www.codeloverme.cn/tags/io/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>编程资料汇总</title>
-    <link href="https://www.codeloverme.cn/books/"/>
-    <id>https://www.codeloverme.cn/books/</id>
-    <published>2022-01-21T13:02:25.000Z</published>
-    <updated>2023-02-10T04:55:48.159Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot; cla
-      
-    
-    </summary>
-    
-    
-      <category term="资料" scheme="https://www.codeloverme.cn/categories/%E8%B5%84%E6%96%99/"/>
-    
-    
-      <category term="编程书籍" scheme="https://www.codeloverme.cn/tags/%E7%BC%96%E7%A8%8B%E4%B9%A6%E7%B1%8D/"/>
-    
-      <category term="ppt" scheme="https://www.codeloverme.cn/tags/ppt/"/>
-    
-      <category term="架构资料" scheme="https://www.codeloverme.cn/tags/%E6%9E%B6%E6%9E%84%E8%B5%84%E6%96%99/"/>
     
   </entry>
   

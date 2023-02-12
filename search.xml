@@ -1,87 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>mlzs</title>
-    <url>/mlzs/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><pre class="mermaid">graph TD
-
-subgraph data
-    node1
-    node2
-    node3
-    node4
-    node5
-    otherIndex
-    defaultIndex
-
-end
-
-subgraph dataDetail
-    val 
-    indexs
-end
-
-node1 --> val
-
-subgraph 默认索引
-    i1_node1(node1) 
-    i1_node2(node2) 
-    i1_node3(node3) 
-    i1_node4(node4) 
-    i1_node5(node5) 
-end
-
-
-subgraph 业务索引1
-    i2_node1(node1) 
-    i2_node2(node2) 
-    i2_node3(node3) 
-end
-
-
-subgraph 业务索引2
-    i3_node1(node1) 
-    i3_node2(node4) 
-    i3_node3(node5) 
-end
-
-
-
-i1_node1 --> i1_node3
-i1_node2--> i1_node4
-i1_node2--> i1_node5
-i1_node1 --> i1_node2
-
-
-i2_node1 --> i2_node3
-i2_node1 --> i2_node2
-
-
-i3_node1 --> i3_node3
-i3_node1 --> i3_node2
-
-indexs -.-> i2_node1
-indexs -.-> i3_node1
-
-
-otherIndex --> i2_node1
-otherIndex --> i3_node1
-defaultIndex --> i1_node1</pre><script type="text&#x2F;javascript" src="https://unpkg.com/kity@2.0.4/dist/kity.min.js"></script><script type="text&#x2F;javascript" src="https://unpkg.com/kityminder-core@1.4.50/dist/kityminder.core.min.js"></script><script defer="true" type="text&#x2F;javascript" src="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.js"></script><link rel="stylesheet" type="text&#x2F;css" href="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.css">]]></content>
-  </entry>
-  <entry>
-    <title>协程到底是什么</title>
-    <url>/coroutine/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><blockquote><p>协程到底是什么？跟</p></blockquote><h1 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h1><script type="text&#x2F;javascript" src="https://unpkg.com/kity@2.0.4/dist/kity.min.js"></script><script type="text&#x2F;javascript" src="https://unpkg.com/kityminder-core@1.4.50/dist/kityminder.core.min.js"></script><script defer="true" type="text&#x2F;javascript" src="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.js"></script><link rel="stylesheet" type="text&#x2F;css" href="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.css">]]></content>
-      <categories>
-        <category>linux系统</category>
-      </categories>
-      <tags>
-        <tag>进程</tag>
-        <tag>线程</tag>
-        <tag>协程</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>epoll的原理和应用</title>
     <url>/epoll/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><blockquote><p>本文介绍epoll的原理，以及各种实际的例子。</p></blockquote><h1 id="系统延时对比"><a href="#系统延时对比" class="headerlink" title="系统延时对比"></a>系统延时对比</h1><ul><li>首先了解下各种操作的延时对比（《性能之巅峰》）</li><li>以 <code>3.3GHz</code> 的CPU为例， <code>1/3.3G=0.3ns</code></li></ul><table><thead><tr><th>事件</th><th>延时</th><th>相对时间</th></tr></thead><tbody><tr><td>1个cpu周期</td><td>0.3ns</td><td>1s</td></tr><tr><td>L1</td><td>0.9ns</td><td>3s</td></tr><tr><td>L2</td><td>2.8ns</td><td>9s</td></tr><tr><td>L3</td><td>12.8ns</td><td>43s</td></tr><tr><td>内存</td><td>120ns</td><td>6min</td></tr><tr><td>固态</td><td>50-160ns</td><td>2-6day</td></tr><tr><td>机械</td><td>1-10ms</td><td>1-12mon</td></tr><tr><td>网络 旧金山-&gt;纽约</td><td>40ms</td><td>4year</td></tr><tr><td>网络 旧金山-&gt;英国</td><td>81ms</td><td>8year</td></tr><tr><td>网络 旧金山-&gt;澳大利亚</td><td>183ms</td><td>19year</td></tr><tr><td>tcp包重传</td><td>1-3s</td><td>105-317year</td></tr><tr><td>os虚拟化系统重启</td><td>4s</td><td>423year</td></tr><tr><td>…</td><td></td><td></td></tr><tr><td>物理系统重启</td><td>5min</td><td>32000year</td></tr></tbody></table><ul><li>一级缓存大约3个时钟周期</li><li>二级缓存大约9个时钟周期</li><li>内存大约360个时钟周期</li><li>可见磁盘io，网络io的耗时和内存访问的差距是十分大的</li><li>直观的感受，一个cpu周期，光只能走0.5米。可能眼睛到书的这段距离，光需要1.7ns，但是cpu已经执行了5个cpu周期了</li></ul><blockquote><p>可见访问不同的存储介质，延时有很大的差别，对于io密集型的应用，比如web服务器，网络rpc，如何让io更高效就成了关键，这里主要探讨的是网络io。</p></blockquote><hr><h1 id="五种io模型"><a href="#五种io模型" class="headerlink" title="五种io模型"></a>五种io模型</h1><h2 id="同步io"><a href="#同步io" class="headerlink" title="同步io"></a>同步io</h2><h3 id="阻塞io（BIO）"><a href="#阻塞io（BIO）" class="headerlink" title="阻塞io（BIO）"></a>阻塞io（BIO）</h3><pre class="mermaid">sequenceDiagram
@@ -170,19 +89,6 @@ c --no--> 释放fd</pre><ul><li>epoll_wait可以支持设置毫秒级别的阻�
         <tag>epoll</tag>
         <tag>事件反应堆</tag>
         <tag>io</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>编程资料汇总</title>
-    <url>/books/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><blockquote><p>持续更新…</p></blockquote><h4 id="编程资料汇总"><a href="#编程资料汇总" class="headerlink" title="编程资料汇总"></a>编程资料汇总</h4><h5 id="书籍"><a href="#书籍" class="headerlink" title="书籍"></a>书籍</h5><blockquote class="pullquote mindmap mindmap-lg"><ul><li>编程书籍推荐<ul><li><a href="https://github.com/ruanyf/free-books" target="_blank" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">github互联网上的免费书籍</a></li><li><a href="https://github.com/justjavac/free-programming-books-zh_CN" target="_blank" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">github免费的编程中文书籍索引</a></li></ul></li></ul></blockquote><h5 id="ppt"><a href="#ppt" class="headerlink" title="ppt"></a>ppt</h5><blockquote class="pullquote mindmap mindmap-lg"><ul><li>ppt<ul><li><a href="https://github.com/xingshaocheng/architect-awesome" target="_blank" target="_blank" target="_blank" rel="noopener external nofollow noopener noreferrer">《后端架构师技术图谱》</a></li></ul></li></ul></blockquote><h5 id="视频"><a href="#视频" class="headerlink" title="视频"></a>视频</h5><blockquote class="pullquote mindmap mindmap-lg"><ul><li>视频</li></ul></blockquote><script type="text&#x2F;javascript" src="https://unpkg.com/kity@2.0.4/dist/kity.min.js"></script><script type="text&#x2F;javascript" src="https://unpkg.com/kityminder-core@1.4.50/dist/kityminder.core.min.js"></script><script defer="true" type="text&#x2F;javascript" src="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.js"></script><link rel="stylesheet" type="text&#x2F;css" href="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.css">]]></content>
-      <categories>
-        <category>资料</category>
-      </categories>
-      <tags>
-        <tag>编程书籍</tag>
-        <tag>ppt</tag>
-        <tag>架构资料</tag>
       </tags>
   </entry>
   <entry>

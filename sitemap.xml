@@ -2,16 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://www.codeloverme.cn/atomic/</loc>
+    <loc>https://www.codeloverme.cn/categories/index.html</loc>
     
-    <lastmod>2023-02-11T16:25:33.278Z</lastmod>
+    <lastmod>2023-02-11T16:53:04.479Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://www.codeloverme.cn/coroutine/</loc>
+    <loc>https://www.codeloverme.cn/atomic/</loc>
     
-    <lastmod>2023-02-11T16:25:14.004Z</lastmod>
+    <lastmod>2023-02-11T16:25:33.278Z</lastmod>
     
   </url>
   
@@ -30,13 +30,6 @@
   </url>
   
   <url>
-    <loc>https://www.codeloverme.cn/mlzs/</loc>
-    
-    <lastmod>2023-02-10T04:55:48.160Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://www.codeloverme.cn/redis-server/</loc>
     
     <lastmod>2023-02-10T04:55:48.160Z</lastmod>
@@ -51,23 +44,9 @@
   </url>
   
   <url>
-    <loc>https://www.codeloverme.cn/categories/index.html</loc>
-    
-    <lastmod>2023-02-10T04:55:48.160Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://www.codeloverme.cn/tags/index.html</loc>
     
     <lastmod>2023-02-10T04:55:48.160Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.codeloverme.cn/books/</loc>
-    
-    <lastmod>2023-02-10T04:55:48.159Z</lastmod>
     
   </url>
   
