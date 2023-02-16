@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://www.codeloverme.cn/"/>
-  <updated>2023-02-16T14:38:03.766Z</updated>
+  <updated>2023-02-16T14:41:06.813Z</updated>
   <id>https://www.codeloverme.cn/</id>
   
   <author>
@@ -21,7 +21,7 @@
     <link href="https://www.codeloverme.cn/redis-new/"/>
     <id>https://www.codeloverme.cn/redis-new/</id>
     <published>2023-02-16T14:34:19.000Z</published>
-    <updated>2023-02-16T14:38:03.766Z</updated>
+    <updated>2023-02-16T14:41:06.813Z</updated>
     
     <summary type="html">
     
@@ -35,6 +35,20 @@
     
       <category term="redis" scheme="https://www.codeloverme.cn/categories/redis/"/>
     
+    
+      <category term="redis实现" scheme="https://www.codeloverme.cn/tags/redis%E5%AE%9E%E7%8E%B0/"/>
+    
+      <category term="listpack" scheme="https://www.codeloverme.cn/tags/listpack/"/>
+    
+      <category term="线程池" scheme="https://www.codeloverme.cn/tags/%E7%BA%BF%E7%A8%8B%E6%B1%A0/"/>
+    
+      <category term="多线程" scheme="https://www.codeloverme.cn/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/"/>
+    
+      <category term="可靠性" scheme="https://www.codeloverme.cn/tags/%E5%8F%AF%E9%9D%A0%E6%80%A7/"/>
+    
+      <category term="主从" scheme="https://www.codeloverme.cn/tags/%E4%B8%BB%E4%BB%8E/"/>
+    
+      <category term="哨兵" scheme="https://www.codeloverme.cn/tags/%E5%93%A8%E5%85%B5/"/>
     
   </entry>
   
