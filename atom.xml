@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <title>&gt;_</title>
+  <title>后端程序员</title>
   
-  <subtitle>一行代码</subtitle>
+  <subtitle>专注于学习分享后端技术，分布式，微服务，架构设计</subtitle>
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://www.codeloverme.cn/"/>
