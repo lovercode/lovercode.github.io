@@ -1,5 +1,5 @@
-https://www.codeloverme.cn/redis-new/
-https://www.codeloverme.cn/epoll/
-https://www.codeloverme.cn/atomic/
-https://www.codeloverme.cn/redis-server/
-https://www.codeloverme.cn/redis/
+https://codeloverme.cn/redis-new/
+https://codeloverme.cn/epoll/
+https://codeloverme.cn/atomic/
+https://codeloverme.cn/redis-server/
+https://codeloverme.cn/redis/

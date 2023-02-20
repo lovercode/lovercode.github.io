@@ -11,5 +11,5 @@ Disallow: /fonts/
 Disallow: /vendors/
 Disallow: /fancybox/
 
-Sitemap: https://www.codeloverme.cn/sitemap.xml
-Sitemap: https://www.codeloverme.cn/baidusitemap.xml
+Sitemap: https://codeloverme.cn/sitemap.xml
+Sitemap: https://codeloverme.cn/baidusitemap.xml
