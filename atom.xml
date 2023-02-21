@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <title>Go backend(Translated by ChatGPT)</title>
+  <title>go后端</title>
   
-  <subtitle>A programmer who cannot write C++ is not a good Go engineer.</subtitle>
+  <subtitle>一个不会写c++的程序员不是一个好的go攻城狮</subtitle>
   <link href="/atom.xml" rel="self"/>
   
-  <link href="https://en.codeloverme.cn/"/>
-  <updated>2023-02-21T15:58:58.665Z</updated>
-  <id>https://en.codeloverme.cn/</id>
+  <link href="https://codeloverme.cn/"/>
+  <updated>2023-02-21T16:09:47.146Z</updated>
+  <id>https://codeloverme.cn/</id>
   
   <author>
     <name>codelover</name>
@@ -18,10 +18,10 @@
   
   <entry>
     <title>redis详解</title>
-    <link href="https://en.codeloverme.cn/redis-new/"/>
-    <id>https://en.codeloverme.cn/redis-new/</id>
+    <link href="https://codeloverme.cn/redis-new/"/>
+    <id>https://codeloverme.cn/redis-new/</id>
     <published>2023-02-16T14:34:19.000Z</published>
-    <updated>2023-02-21T15:58:58.665Z</updated>
+    <updated>2023-02-21T16:09:47.146Z</updated>
     
     <summary type="html">
     
@@ -33,29 +33,29 @@
     </summary>
     
     
-      <category term="redis" scheme="https://en.codeloverme.cn/categories/redis/"/>
+      <category term="redis" scheme="https://codeloverme.cn/categories/redis/"/>
     
     
-      <category term="Redis implementation" scheme="https://en.codeloverme.cn/tags/Redis-implementation/"/>
+      <category term="redis实现" scheme="https://codeloverme.cn/tags/redis%E5%AE%9E%E7%8E%B0/"/>
     
-      <category term="Listpack" scheme="https://en.codeloverme.cn/tags/Listpack/"/>
+      <category term="listpack" scheme="https://codeloverme.cn/tags/listpack/"/>
     
-      <category term="Thread pool" scheme="https://en.codeloverme.cn/tags/Thread-pool/"/>
+      <category term="线程池" scheme="https://codeloverme.cn/tags/%E7%BA%BF%E7%A8%8B%E6%B1%A0/"/>
     
-      <category term="Multithreading" scheme="https://en.codeloverme.cn/tags/Multithreading/"/>
+      <category term="多线程" scheme="https://codeloverme.cn/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/"/>
     
-      <category term="Reliability" scheme="https://en.codeloverme.cn/tags/Reliability/"/>
+      <category term="可靠性" scheme="https://codeloverme.cn/tags/%E5%8F%AF%E9%9D%A0%E6%80%A7/"/>
     
-      <category term="Master-slave" scheme="https://en.codeloverme.cn/tags/Master-slave/"/>
+      <category term="主从" scheme="https://codeloverme.cn/tags/%E4%B8%BB%E4%BB%8E/"/>
     
-      <category term="Sentinel" scheme="https://en.codeloverme.cn/tags/Sentinel/"/>
+      <category term="哨兵" scheme="https://codeloverme.cn/tags/%E5%93%A8%E5%85%B5/"/>
     
   </entry>
   
   <entry>
     <title>epoll的原理和应用</title>
-    <link href="https://en.codeloverme.cn/epoll/"/>
-    <id>https://en.codeloverme.cn/epoll/</id>
+    <link href="https://codeloverme.cn/epoll/"/>
+    <id>https://codeloverme.cn/epoll/</id>
     <published>2022-01-21T15:21:34.000Z</published>
     <updated>2023-02-11T16:24:48.510Z</updated>
     
@@ -69,21 +69,21 @@
     </summary>
     
     
-      <category term="linux系统" scheme="https://en.codeloverme.cn/categories/linux%E7%B3%BB%E7%BB%9F/"/>
+      <category term="linux系统" scheme="https://codeloverme.cn/categories/linux%E7%B3%BB%E7%BB%9F/"/>
     
     
-      <category term="epoll" scheme="https://en.codeloverme.cn/tags/epoll/"/>
+      <category term="epoll" scheme="https://codeloverme.cn/tags/epoll/"/>
     
-      <category term="事件反应堆" scheme="https://en.codeloverme.cn/tags/%E4%BA%8B%E4%BB%B6%E5%8F%8D%E5%BA%94%E5%A0%86/"/>
+      <category term="事件反应堆" scheme="https://codeloverme.cn/tags/%E4%BA%8B%E4%BB%B6%E5%8F%8D%E5%BA%94%E5%A0%86/"/>
     
-      <category term="io" scheme="https://en.codeloverme.cn/tags/io/"/>
+      <category term="io" scheme="https://codeloverme.cn/tags/io/"/>
     
   </entry>
   
   <entry>
     <title>浅谈原子操作的实现原理</title>
-    <link href="https://en.codeloverme.cn/atomic/"/>
-    <id>https://en.codeloverme.cn/atomic/</id>
+    <link href="https://codeloverme.cn/atomic/"/>
+    <id>https://codeloverme.cn/atomic/</id>
     <published>2022-01-18T17:18:32.000Z</published>
     <updated>2023-02-11T16:25:33.278Z</updated>
     
@@ -97,29 +97,29 @@
     </summary>
     
     
-      <category term="linux系统" scheme="https://en.codeloverme.cn/categories/linux%E7%B3%BB%E7%BB%9F/"/>
+      <category term="linux系统" scheme="https://codeloverme.cn/categories/linux%E7%B3%BB%E7%BB%9F/"/>
     
     
-      <category term="atomic" scheme="https://en.codeloverme.cn/tags/atomic/"/>
+      <category term="atomic" scheme="https://codeloverme.cn/tags/atomic/"/>
     
-      <category term="原子" scheme="https://en.codeloverme.cn/tags/%E5%8E%9F%E5%AD%90/"/>
+      <category term="原子" scheme="https://codeloverme.cn/tags/%E5%8E%9F%E5%AD%90/"/>
     
-      <category term="多核" scheme="https://en.codeloverme.cn/tags/%E5%A4%9A%E6%A0%B8/"/>
+      <category term="多核" scheme="https://codeloverme.cn/tags/%E5%A4%9A%E6%A0%B8/"/>
     
-      <category term="锁" scheme="https://en.codeloverme.cn/tags/%E9%94%81/"/>
+      <category term="锁" scheme="https://codeloverme.cn/tags/%E9%94%81/"/>
     
-      <category term="MESI" scheme="https://en.codeloverme.cn/tags/MESI/"/>
+      <category term="MESI" scheme="https://codeloverme.cn/tags/MESI/"/>
     
-      <category term="缓存一致性" scheme="https://en.codeloverme.cn/tags/%E7%BC%93%E5%AD%98%E4%B8%80%E8%87%B4%E6%80%A7/"/>
+      <category term="缓存一致性" scheme="https://codeloverme.cn/tags/%E7%BC%93%E5%AD%98%E4%B8%80%E8%87%B4%E6%80%A7/"/>
     
-      <category term="内存屏障" scheme="https://en.codeloverme.cn/tags/%E5%86%85%E5%AD%98%E5%B1%8F%E9%9A%9C/"/>
+      <category term="内存屏障" scheme="https://codeloverme.cn/tags/%E5%86%85%E5%AD%98%E5%B1%8F%E9%9A%9C/"/>
     
   </entry>
   
   <entry>
     <title>redis-服务端部分实现原理</title>
-    <link href="https://en.codeloverme.cn/redis-server/"/>
-    <id>https://en.codeloverme.cn/redis-server/</id>
+    <link href="https://codeloverme.cn/redis-server/"/>
+    <id>https://codeloverme.cn/redis-server/</id>
     <published>2022-01-05T03:31:51.000Z</published>
     <updated>2023-02-10T04:55:48.160Z</updated>
     
@@ -133,19 +133,19 @@
     </summary>
     
     
-      <category term="redis" scheme="https://en.codeloverme.cn/categories/redis/"/>
+      <category term="redis" scheme="https://codeloverme.cn/categories/redis/"/>
     
     
-      <category term="redis单机数据库" scheme="https://en.codeloverme.cn/tags/redis%E5%8D%95%E6%9C%BA%E6%95%B0%E6%8D%AE%E5%BA%93/"/>
+      <category term="redis单机数据库" scheme="https://codeloverme.cn/tags/redis%E5%8D%95%E6%9C%BA%E6%95%B0%E6%8D%AE%E5%BA%93/"/>
     
-      <category term="redis" scheme="https://en.codeloverme.cn/tags/redis/"/>
+      <category term="redis" scheme="https://codeloverme.cn/tags/redis/"/>
     
   </entry>
   
   <entry>
     <title>redis设计与实现--数据结构与对象</title>
-    <link href="https://en.codeloverme.cn/redis/"/>
-    <id>https://en.codeloverme.cn/redis/</id>
+    <link href="https://codeloverme.cn/redis/"/>
+    <id>https://codeloverme.cn/redis/</id>
     <published>2021-01-28T06:17:49.000Z</published>
     <updated>2023-02-11T16:25:00.485Z</updated>
     
@@ -159,24 +159,24 @@
     </summary>
     
     
-      <category term="redis" scheme="https://en.codeloverme.cn/categories/redis/"/>
+      <category term="redis" scheme="https://codeloverme.cn/categories/redis/"/>
     
     
-      <category term="redis" scheme="https://en.codeloverme.cn/tags/redis/"/>
+      <category term="redis" scheme="https://codeloverme.cn/tags/redis/"/>
     
-      <category term="redis设计与实现" scheme="https://en.codeloverme.cn/tags/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0/"/>
+      <category term="redis设计与实现" scheme="https://codeloverme.cn/tags/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0/"/>
     
-      <category term="redis数据结构" scheme="https://en.codeloverme.cn/tags/redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"/>
+      <category term="redis数据结构" scheme="https://codeloverme.cn/tags/redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"/>
     
-      <category term="跳表" scheme="https://en.codeloverme.cn/tags/%E8%B7%B3%E8%A1%A8/"/>
+      <category term="跳表" scheme="https://codeloverme.cn/tags/%E8%B7%B3%E8%A1%A8/"/>
     
-      <category term="sds" scheme="https://en.codeloverme.cn/tags/sds/"/>
+      <category term="sds" scheme="https://codeloverme.cn/tags/sds/"/>
     
-      <category term="链表" scheme="https://en.codeloverme.cn/tags/%E9%93%BE%E8%A1%A8/"/>
+      <category term="链表" scheme="https://codeloverme.cn/tags/%E9%93%BE%E8%A1%A8/"/>
     
-      <category term="hash table" scheme="https://en.codeloverme.cn/tags/hash-table/"/>
+      <category term="hash table" scheme="https://codeloverme.cn/tags/hash-table/"/>
     
-      <category term="字典" scheme="https://en.codeloverme.cn/tags/%E5%AD%97%E5%85%B8/"/>
+      <category term="字典" scheme="https://codeloverme.cn/tags/%E5%AD%97%E5%85%B8/"/>
     
   </entry>
   
