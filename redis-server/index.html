@@ -34,12 +34,12 @@ Note over 连接处理器: 服务启动时会<br>为连接套接字绑定<br>连
 命令回复处理器->>客户端: 处理命令回复处理器，给客户端回包</pre><h4 id="时间事件"><a href="#时间事件" class="headerlink" title="时间事件"></a>时间事件</h4><ul><li>redis包含定时时间事件和周期时间事件，通过时间处理器返回的AE_NOMORE来决定</li><li>redis的时间事件和文件事件是一起调度的<h5 id="实现-1"><a href="#实现-1" class="headerlink" title="实现"></a>实现</h5></li><li>每次执行事件循环<code>aeProcessEvents</code>，都先获取最近的时间事件到达的时间，用这个时间来决定，每次epoll或者其他(select)阻塞的时间，如果期间没有文件事件，那么epoll阻塞完，就刚好需要执行时间事件</li><li>如果最后一次文件时间处理事件过长，会导致时间事件被延后执行，因为此处redis是单进程单线程的</li><li>时间事件中类似持久化的操作会放到子线程或者子进程，防止时间事件长时间阻塞</li><li>文件时间也尽量不长时间阻塞服务器，当write时，如果超过某个阈值，会直接break，下次再写</li></ul><script type="text&#x2F;javascript" src="https://unpkg.com/kity@2.0.4/dist/kity.min.js"></script><script type="text&#x2F;javascript" src="https://unpkg.com/kityminder-core@1.4.50/dist/kityminder.core.min.js"></script><script defer type="text&#x2F;javascript" src="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.js"></script><link rel="stylesheet" type="text&#x2F;css" href="https://unpkg.com/hexo-simple-mindmap@0.8.0/dist/mindmap.min.css"></div><div><div id="wechat_subscriber" style="display:block;padding:10px 0;margin:20px auto;width:100%;text-align:center"><img id="wechat_subscriber_qcode" src="/images/wechat.jpg" alt="codelover wechat" style="width:200px;max-width:100%"><div>原创公众号</div></div></div><div><style>#rewardButton span{display:inline-block;width:80px;height:35px;border-radius:5px;color:#fff;font-weight:400;font-style:normal;font-variant:normal;font-stretch:normal;font-size:18px;font-family:"Microsoft Yahei";background:#f44336}#rewardButton{cursor:pointer;border:0;outline:0;border-radius:100%;padding:0;margin:0;letter-spacing:normal;text-transform:none;text-indent:0;text-shadow:none}</style><div style="padding:10px 0;margin:20px auto;width:90%;text-align:center"><div></div><button id="rewardButton" disable="enable" onclick='var qr=document.getElementById("QR");"none"===qr.style.display?qr.style.display="block":qr.style.display="none"'><span>赏</span></button><div id="QR" style="display:none"><div id="wechat" style="display:inline-block"><img id="wechat_qr" width="50%" height="50%" src="/images/reward.jpg" alt="codelover 微信支付"><p>微信支付</p></div></div></div></div><footer class="post-footer"><div class="post-tags"><a href="/tags/redis%E5%8D%95%E6%9C%BA%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag"><i class="fa fa-tag"></i> redis单机数据库</a> <a href="/tags/redis/" rel="tag"><i class="fa fa-tag"></i> redis</a></div><div class="post-nav"><div class="post-nav-next post-nav-item"><a href="/redis/" rel="next" title="redis设计与实现--数据结构与对象"><i class="fa fa-chevron-left"></i> redis设计与实现--数据结构与对象</a></div><span class="post-nav-divider"></span><div class="post-nav-prev post-nav-item"><a href="/atomic/" rel="prev" title="浅谈原子操作的实现原理">浅谈原子操作的实现原理 <i class="fa fa-chevron-right"></i></a></div></div></footer></div><div><div><div style="text-align:center;color:#ccc;font-size:14px">-----若有不妥，敬请斧正-----</div></div></div></article><script type="application/ld+json">{
     "@context": "https://schema.org/",
     "@type": "BlogPosting",
-    "@id": "",
+    "@id": "https://codeloverme.cn/redis-server/",
     "headline": "redis-服务端部分实现原理",
     "name": "redis-服务端部分实现原理",
     "description": "",
-    "datePublished": "1641353511000",
-    "dateModified": "1641353511000",
+    "datePublished": "2022-01-05T11:31:51+08:00",
+    "dateModified": "2022-01-05T11:31:51+08:00",
     "author": {
         "@type": "Person",
         "@id": "https://codeloverme.cn",
@@ -48,7 +48,7 @@ Note over 连接处理器: 服务启动时会<br>为连接套接字绑定<br>连
         "image": {
         }
     },
-    "url": "",
+    "url": "https://codeloverme.cn/redis-server/",
     "commentCount": "0",
     "comment": [
     ],
