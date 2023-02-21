@@ -3,6 +3,8 @@ Allow: /
 Allow: /archives/
 Allow: /tags/
 Allow: /categories/
+Allow: /js/
+Allow: /css/
 
 Disallow: /vendors/
 Disallow: /fonts/
