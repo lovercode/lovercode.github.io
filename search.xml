@@ -494,8 +494,8 @@ Note over 连接处理器: 服务启动时会<br>为连接套接字绑定<br>连
         <category>redis</category>
       </categories>
       <tags>
-        <tag>redis单机数据库</tag>
         <tag>redis</tag>
+        <tag>redis单机数据库</tag>
       </tags>
   </entry>
   <entry>
