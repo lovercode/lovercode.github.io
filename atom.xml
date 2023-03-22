@@ -158,9 +158,9 @@
       <category term="redis" scheme="https://codeloverme.cn/categories/redis/"/>
     
     
-      <category term="redis" scheme="https://codeloverme.cn/tags/redis/"/>
-    
       <category term="redis单机数据库" scheme="https://codeloverme.cn/tags/redis%E5%8D%95%E6%9C%BA%E6%95%B0%E6%8D%AE%E5%BA%93/"/>
+    
+      <category term="redis" scheme="https://codeloverme.cn/tags/redis/"/>
     
   </entry>
   
