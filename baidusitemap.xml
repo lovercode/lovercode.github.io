@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://codeloverme.cn/mysql/</loc>
+    <lastmod>2023-03-22</lastmod>
+  </url>  <url>
     <loc>https://codeloverme.cn/redis-new/</loc>
     <lastmod>2023-03-02</lastmod>
-  </url>  <url>
-    <loc>https://codeloverme.cn/go-mem/</loc>
-    <lastmod>2023-03-01</lastmod>
   </url>  <url>
     <loc>https://codeloverme.cn/atomic/</loc>
     <lastmod>2023-02-11</lastmod>
